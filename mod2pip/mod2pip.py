@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""pipreqs - Generate pip requirements.txt file based on imports
+"""mod2pip - Generate pip requirements.txt file based on imports
 
 Usage:
-    pipreqs [options] [<path>]
+    mod2pip [options] [<path>]
 
 Arguments:
     <path>                The path to the directory containing the application

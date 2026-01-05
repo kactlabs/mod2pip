@@ -11,7 +11,7 @@ import shutil
 # Add the current directory to Python path to import mod2pip
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from mod2pip import pipreqs
+from mod2pip import mod2pip
 
 def create_test_project():
     """Create a test project with various import patterns."""
@@ -67,19 +67,19 @@ def test_enhanced_detection():
         print("Testing enhanced import detection...")
         
         # Test basic import detection
-        imports = pipreqs.get_all_imports(test_dir)
+        imports = mod2pip.get_all_imports(test_dir)
         print(f"Found imports: {imports}")
         
         # Test local package detection
-        local_packages = pipreqs.get_locally_installed_packages()
+        local_packages = mod2pip.get_locally_installed_packages()
         print(f"Found {len(local_packages)} local packages")
         
         # Test package name mapping
-        pkg_names = pipreqs.get_pkg_names(imports)
+        pkg_names = mod2pip.get_pkg_names(imports)
         print(f"Mapped package names: {pkg_names}")
         
         # Test local import resolution
-        local_imports = pipreqs.get_import_local(imports)
+        local_imports = mod2pip.get_import_local(imports)
         print(f"Resolved local imports: {[pkg['name'] for pkg in local_imports]}")
         
         print("Enhanced detection test completed successfully!")
@@ -102,7 +102,7 @@ def test_conda_detection():
         print(f"Conda environment detected: {conda_prefix}")
         
         # Test conda package detection
-        packages = pipreqs._get_conda_packages()
+        packages = mod2pip._get_conda_packages()
         print(f"Found {len(packages)} conda packages")
         
         if packages:
@@ -123,7 +123,7 @@ def test_transitive_dependencies():
     ]
     
     try:
-        transitive_deps = pipreqs.get_transitive_dependencies(sample_packages, max_depth=1)
+        transitive_deps = mod2pip.get_transitive_dependencies(sample_packages, max_depth=1)
         print(f"Found {len(transitive_deps)} transitive dependencies")
         
         if transitive_deps:
