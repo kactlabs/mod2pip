@@ -47,7 +47,7 @@ jobs:
                   poetry install --with dev
 
             - name: Calculate coverage
-              run: poetry run coverage run --source=pipreqs -m unittest discover
+              run: poetry run coverage run --source=mod2pip -m unittest discover
 
             - name: Create XML report
               run: poetry run coverage xml

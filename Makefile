@@ -36,7 +36,7 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	poetry run flake8 pipreqs tests
+	poetry run flake8 mod2pip tests
 
 test:
 	poetry run python -m unittest discover 
@@ -45,15 +45,15 @@ test-all:
 	poetry run tox
 
 coverage:
-	coverage run --source pipreqs setup.py test
+	coverage run --source mod2pip setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
 
 docs:
-	rm -f docs/pipreqs.rst
+	rm -f docs/mod2pip.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ pipreqs
+	sphinx-apidoc -o docs/ mod2pip
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html

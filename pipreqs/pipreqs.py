@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""pipreqs - Generate pip requirements.txt file based on imports
+"""mod2pip - Generate pip requirements.txt file based on imports
 
 Usage:
-    pipreqs [options] [<path>]
+    mod2pip [options] [<path>]
 
 Arguments:
     <path>                The path to the directory containing the application
@@ -49,7 +49,7 @@ import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
-from pipreqs import __version__
+from mod2pip import __version__
 
 REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
 DEFAULT_EXTENSIONS = [".py", ".pyw"]

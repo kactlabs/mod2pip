@@ -13,7 +13,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/bndr/pipreqs/issues.
+Report bugs at https://github.com/kactlabs/mod2pip/issues.
 
 If you are reporting a bug, please include:
 
@@ -36,14 +36,14 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-pipreqs could always use more documentation, whether as part of the
-official pipreqs docs, in docstrings, or even on the web in blog posts,
+mod2pip could always use more documentation, whether as part of the
+official mod2pip docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/bndr/pipreqs/issues.
+The best way to send feedback is to file an issue at https://github.com/kactlabs/mod2pip/issues.
 
 If you are proposing a feature:
 
@@ -55,15 +55,15 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `pipreqs` for local development.
+Ready to contribute? Here's how to set up `mod2pip` for local development.
 
-1. Fork the `pipreqs` repo on GitHub.
+1. Fork the `mod2pip` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/pipreqs.git
-    $ cd pipreqs/
+    $ git clone git@github.com:your_name_here/mod2pip.git
+    $ cd mod2pip/
 
-3. Pipreqs is developed using Poetry. Refer to the `documentation <https://python-poetry.org/docs/>`_ to install Poetry in your local environment. Next, you should install pipreqs's dependencies::
+3. Mod2pip is developed using Poetry. Refer to the `documentation <https://python-poetry.org/docs/>`_ to install Poetry in your local environment. Next, you should install mod2pip's dependencies::
 
     $ poetry install --with dev
 
@@ -75,7 +75,7 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
-    $ poetry run flake8 pipreqs tests
+    $ poetry run flake8 mod2pip tests
     $ poetry run python -m unittest discover
     $ poetry run tox
     
@@ -99,7 +99,7 @@ Before you submit a pull request, check that it meets these guidelines:
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
 3. The pull request should work for currently supported Python and PyPy versions. Check
-   https://travis-ci.org/bndr/pipreqs/pull_requests and make sure that the
+   https://travis-ci.org/kactlabs/mod2pip/pull_requests and make sure that the
    tests pass for all supported Python versions.
 
 Tips
@@ -107,4 +107,4 @@ Tips
 
 To run a subset of tests::
 
-    $ poetry run python -m unittest tests.test_pipreqs
+    $ poetry run python -m unittest tests.test_mod2pip

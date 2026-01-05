@@ -4,9 +4,9 @@ Installation
 
 At the command line::
 
-    $ easy_install pipreqs
+    $ easy_install mod2pip
 
 Or, if you have virtualenvwrapper installed::
 
-    $ mkvirtualenv pipreqs
-    $ pip install pipreqs
+    $ mkvirtualenv mod2pip
+    $ pip install mod2pip

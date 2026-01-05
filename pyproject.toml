@@ -1,5 +1,5 @@
 [project]
-name = "pipreqs"
+name = "mod2pip"
 version = "0.5.0"
 description = "Pip requirements.txt generator based on imports in project"
 authors = [
@@ -10,8 +10,8 @@ maintainers = [
 ]
 license = "Apache-2.0"
 readme = "README.rst"
-packages = [{ include = "pipreqs" }]
-repository = "https://github.com/bndr/pipreqs"
+packages = [{ include = "mod2pip" }]
+repository = "https://github.com/kactlabs/mod2pip"
 keywords = ["pip", "requirements", "imports"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -42,7 +42,7 @@ dev = [
 
 
 [tool.poetry.scripts]
-pipreqs = "pipreqs.pipreqs:main"
+mod2pip = "mod2pip.mod2pip:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

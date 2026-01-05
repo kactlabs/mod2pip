@@ -1,20 +1,20 @@
 =============================================================================
-``pipreqs`` - Generate requirements.txt file for any project based on imports
+``mod2pip`` - Generate requirements.txt file for any project based on imports
 =============================================================================
 
-.. image:: https://github.com/bndr/pipreqs/actions/workflows/tests.yml/badge.svg
-        :target: https://github.com/bndr/pipreqs/actions/workflows/tests.yml
+.. image:: https://github.com/kactlabs/mod2pip/actions/workflows/tests.yml/badge.svg
+        :target: https://github.com/kactlabs/mod2pip/actions/workflows/tests.yml
 
 
-.. image:: https://img.shields.io/pypi/v/pipreqs.svg
-        :target: https://pypi.python.org/pypi/pipreqs
+.. image:: https://img.shields.io/pypi/v/mod2pip.svg
+        :target: https://pypi.python.org/pypi/mod2pip
 
 
-.. image:: https://codecov.io/gh/bndr/pipreqs/branch/master/graph/badge.svg?token=0rfPfUZEAX
-        :target: https://codecov.io/gh/bndr/pipreqs
+.. image:: https://codecov.io/gh/kactlabs/mod2pip/branch/master/graph/badge.svg?token=0rfPfUZEAX
+        :target: https://codecov.io/gh/kactlabs/mod2pip
 
-.. image:: https://img.shields.io/pypi/l/pipreqs.svg
-        :target: https://pypi.python.org/pypi/pipreqs
+.. image:: https://img.shields.io/pypi/l/mod2pip.svg
+        :target: https://pypi.python.org/pypi/mod2pip
 
 
 
@@ -23,14 +23,14 @@ Installation
 
 .. code-block:: sh
 
-    pip install pipreqs
+    pip install mod2pip
 
-Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it. 
+Obs.: if you don't want support for jupyter notebooks, you can install mod2pip without the dependencies that give support to it. 
 To do so, run:
 
 .. code-block:: sh
 
-    pip install --no-deps pipreqs
+    pip install --no-deps mod2pip
     pip install yarg==0.1.9 docopt==0.6.2
 
 Usage
@@ -39,7 +39,7 @@ Usage
 ::
 
     Usage:
-        pipreqs [options] [<path>]
+        mod2pip [options] [<path>]
 
     Arguments:
         <path>                The path to the directory containing the application files for which a requirements file
@@ -72,7 +72,7 @@ Example
 
 ::
 
-    $ pipreqs /home/project/location
+    $ mod2pip /home/project/location
     Successfully saved requirements file in /home/project/location/requirements.txt
 
 Contents of requirements.txt

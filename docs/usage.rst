@@ -2,6 +2,6 @@
 Usage
 ========
 
-To use pipreqs in a project::
+To use mod2pip in a project::
 
-    import pipreqs
+    import mod2pip

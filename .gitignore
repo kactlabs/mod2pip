@@ -52,4 +52,4 @@ Session.vim
 .netrwhist
 *~
 
-/pipreqs/*.bak
+/mod2pip/*.bak

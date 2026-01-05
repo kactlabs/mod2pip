@@ -55,7 +55,7 @@ History
 ---------------------
 
 * Add more package mapping
-* fix(pipreqs/mapping): remove pylab reference to matplotlib
+* fix(mod2pip/mapping): remove pylab reference to matplotlib
 * Remove comments """ before going through imports
 * Update proxy documentation
 
