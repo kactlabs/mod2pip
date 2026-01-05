@@ -1,21 +1,19 @@
 [project]
 name = "mod2pip"
 version = "0.5.0"
-description = "Pip requirements.txt generator based on imports in project"
+description = "Enhanced pip requirements.txt generator with dynamic import detection and conda support"
 authors = [
     { name = "Raja CSP Raman", email = "raja.csp@gmail.com" }
 ]
 maintainers = [
-    {name = "Jonas Eschle", email = "jonas.eschle@gmail.com"}
+    { name = "Raja CSP Raman", email = "raja.csp@gmail.com" }
 ]
 license = "Apache-2.0"
 readme = "README.rst"
-repository = "https://github.com/kactlabs/mod2pip"
-keywords = ["pip", "requirements", "imports"]
+keywords = ["pip", "requirements", "imports", "dependencies", "conda", "dynamic-imports"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
@@ -23,14 +21,24 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Software Distribution",
+    "Topic :: Utilities",
 ]
-requires-python = ">=3.9, <3.14"
+requires-python = ">=3.9"
 dependencies = [
     "yarg>=0.1.9",
     "docopt>=0.6.2",
     "nbconvert>=7.11.0",
     "ipython>=8.12.3",
+    "requests>=2.25.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/kactlabs/mod2pip"
+Repository = "https://github.com/kactlabs/mod2pip"
+Documentation = "https://github.com/kactlabs/mod2pip"
+"Bug Tracker" = "https://github.com/kactlabs/mod2pip/issues"
 
 [project.scripts]
 mod2pip = "mod2pip.mod2pip:main"
@@ -44,5 +52,5 @@ dev = [
 ]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
