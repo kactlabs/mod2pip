@@ -201,6 +201,10 @@ def _get_dynamic_imports(contents):
     """Extract dynamic imports using pattern matching."""
     imports = set()
 
+    # Ensure contents is a string
+    if isinstance(contents, bytes):
+        contents = contents.decode('utf-8')
+
     # Pattern 1: __import__('module_name')
     import_pattern1 = re.compile(r'__import__\s*\(\s*["\']([^"\']+)["\']')
 
@@ -253,6 +257,10 @@ def _get_regex_imports(contents):
     """Fallback regex-based import extraction."""
     imports = set()
 
+    # Ensure contents is a string
+    if isinstance(contents, bytes):
+        contents = contents.decode('utf-8')
+
     # Basic import patterns
     import_patterns = [
         re.compile(r'^import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.MULTILINE),
@@ -289,6 +297,9 @@ def read_file_content(file_name: str, encoding="utf-8"):
             contents = f.read()
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
+        # Ensure contents is a string, not bytes
+        if isinstance(contents, bytes):
+            contents = contents.decode(encoding)
     return contents
 
 
