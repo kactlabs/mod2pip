@@ -154,3 +154,25 @@ If you encounter Python 3.13 issues in CI:
 3. **Add explicit dependencies**: Include setuptools>=61.0 and wheel
 4. **Test import first**: Verify module imports before running tests
 5. **Use version constraints**: Pin compatible versions for stability
+6. **Run debug script**: Use `python ci_debug.py` to diagnose environment issues
+
+## 🛠️ CI/CD Enhancements (v0.6.0)
+
+### Enhanced GitHub Actions
+- Added timeout controls (10min for deps, 45min for tests)
+- Environment debugging information
+- Better error handling and logging
+- Optimized environment variables for CI
+
+### Improved Tox Configuration
+- Added `--buffer` flag for cleaner test output
+- Environment variables for better CI performance:
+  - `PYTHONDONTWRITEBYTECODE=1` - Skip .pyc file generation
+  - `PYTHONUNBUFFERED=1` - Force unbuffered output
+- Debug script integration for troubleshooting
+
+### Debug Tools
+- `ci_debug.py` - Comprehensive environment and dependency checker
+- Automatic import detection testing
+- Version reporting for all dependencies
+- Environment validation before running tests
