@@ -1,0 +1,6 @@
+# Development dependencies for mod2pip
+flake8>=6.1.0
+tox>=4.11.3
+coverage>=7.3.2
+twine>=4.0.0
+build>=0.10.0
