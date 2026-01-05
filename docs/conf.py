@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'mod2pip'
-copyright = u'2015, Vadim Kravcenko'
+copyright = u'2015, Raja CSP Raman'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -210,7 +210,7 @@ latex_elements = {
 latex_documents = [
     ('index', 'mod2pip.tex',
      u'mod2pip Documentation',
-     u'Vadim Kravcenko', 'manual'),
+     u'Raja CSP Raman', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at
@@ -241,7 +241,7 @@ latex_documents = [
 man_pages = [
     ('index', 'mod2pip',
      u'mod2pip Documentation',
-     [u'Vadim Kravcenko'], 1)
+     [u'Raja CSP Raman'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -256,7 +256,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'mod2pip',
      u'mod2pip Documentation',
-     u'Vadim Kravcenko',
+     u'Raja CSP Raman',
      'mod2pip',
      'One line description of project.',
      'Miscellaneous'),

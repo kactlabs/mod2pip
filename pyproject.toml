@@ -3,14 +3,13 @@ name = "mod2pip"
 version = "0.5.0"
 description = "Pip requirements.txt generator based on imports in project"
 authors = [
-    { name = "Vadim Kravcenko", email = "vadim.kravcenko@gmail.com" }
+    { name = "Raja CSP Raman", email = "raja.csp@gmail.com" }
 ]
 maintainers = [
     {name = "Jonas Eschle", email = "jonas.eschle@gmail.com"}
 ]
 license = "Apache-2.0"
 readme = "README.rst"
-packages = [{ include = "mod2pip" }]
 repository = "https://github.com/kactlabs/mod2pip"
 keywords = ["pip", "requirements", "imports"]
 classifiers = [
@@ -32,6 +31,10 @@ dependencies = [
     "nbconvert>=7.11.0",
     "ipython>=8.12.3",
 ]
+
+[project.scripts]
+mod2pip = "mod2pip.mod2pip:main"
+
 [project.optional-dependencies]
 dev = [
     "flake8>=6.1.0",
@@ -39,10 +42,6 @@ dev = [
     "coverage>=7.3.2",
     "sphinx>=7.2.6;python_version>='3.9'",
 ]
-
-
-[tool.poetry.scripts]
-mod2pip = "mod2pip.mod2pip:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

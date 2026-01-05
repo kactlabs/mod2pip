@@ -1,3 +1,3 @@
-__author__ = 'Vadim Kravcenko'
-__email__ = 'vadim.kravcenko@gmail.com'
+__author__ = 'Raja CSP Raman'
+__email__ = 'raja.csp@gmail.com'
 __version__ = '0.5.0'
