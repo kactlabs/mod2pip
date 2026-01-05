@@ -7,7 +7,7 @@ help:
 	@echo "clean-test - remove test and coverage artifacts"
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly using the default Python"
-	@echo "test-all - run tests on every Python version with tox"
+	@echo "test-all - run tests on current Python version"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
 	@echo "publish - package and upload a release"
@@ -37,13 +37,14 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 mod2pip tests
+	flake8 mod2pip tests/test_mod2pip.py --max-line-length=100
 
 test:
 	python -m unittest discover 
 
 test-all:
-	tox
+	python ci_debug.py
+	python -m unittest discover -s tests -p "test_*.py" -v
 
 coverage:
 	coverage run --source mod2pip -m unittest discover

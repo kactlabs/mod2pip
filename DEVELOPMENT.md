@@ -22,17 +22,14 @@ pip install -e .
 # Run tests on current Python version
 python -m unittest discover -s tests -p "test_*.py" -v
 
-# Run tests on all Python versions with tox
-tox
-
-# Run tests on specific Python version
-tox -e py39
-tox -e py313
+# Run tests with debug information
+make test-all
 
 # Run flake8 linting
-tox -e flake8
-# or directly
 flake8 mod2pip tests/test_mod2pip.py --max-line-length=100
+
+# Run debug script to check environment
+python ci_debug.py
 ```
 
 ### Code Quality
@@ -92,7 +89,6 @@ make install-dev          # Install development dependencies
 
 ### Development Dependencies
 - `flake8>=6.1.0` - Code linting
-- `tox>=4.11.3` - Testing across Python versions
 - `coverage>=7.3.2` - Code coverage
 - `twine>=4.0.0` - PyPI publishing
 - `build>=0.10.0` - Package building
@@ -146,7 +142,7 @@ If you encounter issues with Python 3.13:
 - Check that nbconvert>=7.16.0 and ipython>=8.18.0 are installed
 
 ### Tox Issues
-If tox fails:
-- Clean tox environments: `tox -e clean` or `rm -rf .tox/`
-- Recreate environments: `tox -r`
-- Check Python versions are available: `python3.9 --version`, etc.
+If you need to test multiple Python versions:
+- Use GitHub Actions CI which tests Python 3.9-3.13
+- Or manually test with different Python environments
+- Check that all dependencies install correctly: `pip install -r requirements-dev.txt`
