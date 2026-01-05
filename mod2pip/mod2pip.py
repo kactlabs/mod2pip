@@ -144,10 +144,10 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
                 # Enhanced import detection
                 static_imports = _get_static_imports(contents)
                 dynamic_imports = _get_dynamic_imports(contents)
-                
+
                 raw_imports.update(static_imports)
                 raw_imports.update(dynamic_imports)
-                
+
             except Exception as exc:
                 if ignore_errors:
                     traceback.print_exc(exc)
@@ -179,7 +179,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 def _get_static_imports(contents):
     """Extract imports using AST parsing (existing method)."""
     imports = set()
-    
+
     try:
         tree = ast.parse(contents)
         for node in ast.walk(tree):
@@ -193,74 +193,76 @@ def _get_static_imports(contents):
     except SyntaxError:
         # If AST parsing fails, fall back to regex
         imports.update(_get_regex_imports(contents))
-    
+
     return imports
 
 
 def _get_dynamic_imports(contents):
     """Extract dynamic imports using pattern matching."""
     imports = set()
-    
+
     # Pattern 1: __import__('module_name')
     import_pattern1 = re.compile(r'__import__\s*\(\s*["\']([^"\']+)["\']')
-    
+
     # Pattern 2: importlib.import_module('module_name')
     import_pattern2 = re.compile(r'import_module\s*\(\s*["\']([^"\']+)["\']')
-    
+
     # Pattern 3: exec("import module_name") or eval("import module_name")
-    exec_import_pattern = re.compile(r'(?:exec|eval)\s*\(\s*["\'].*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)')
-    
+    exec_import_pattern = re.compile(
+        r'(?:exec|eval)\s*\(\s*["\'].*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)')
+
     # Pattern 4: Dynamic imports in f-strings or format strings
     fstring_import_pattern = re.compile(r'f["\'].*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)')
-    
+
     # Pattern 5: Conditional imports (try/except blocks)
     try_import_pattern = re.compile(r'try\s*:.*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.DOTALL)
-    
+
     # Pattern 6: Late imports (imports inside functions)
-    function_import_pattern = re.compile(r'def\s+\w+.*?:\s*.*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.DOTALL)
-    
+    function_import_pattern = re.compile(
+        r'def\s+\w+.*?:\s*.*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.DOTALL)
+
     patterns = [
         import_pattern1, import_pattern2, exec_import_pattern,
         fstring_import_pattern, try_import_pattern, function_import_pattern
     ]
-    
+
     for pattern in patterns:
         matches = pattern.findall(contents)
         for match in matches:
             if match and not match.startswith('.'):  # Skip relative imports
                 imports.add(match)
-    
+
     # Additional pattern: Look for string literals that might be module names
     # This catches cases like: module_name = "requests"; __import__(module_name)
     string_literals = re.findall(r'["\']([a-zA-Z_][a-zA-Z0-9_]*)["\']', contents)
     potential_modules = set()
-    
+
     for literal in string_literals:
         # Check if this string appears in an import context
-        if (f'__import__({literal})' in contents or 
+        if (f'__import__({literal})' in contents or
             f'import_module({literal})' in contents or
-            literal in _get_common_package_names()):
+                literal in _get_common_package_names()):
             potential_modules.add(literal)
-    
+
     imports.update(potential_modules)
-    
+
     return imports
 
 
 def _get_regex_imports(contents):
     """Fallback regex-based import extraction."""
     imports = set()
-    
+
     # Basic import patterns
     import_patterns = [
         re.compile(r'^import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.MULTILINE),
         re.compile(r'^from\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+import', re.MULTILINE),
     ]
-    
+
     for pattern in import_patterns:
         matches = pattern.findall(contents)
         imports.update(matches)
-    
+
     return imports
 
 
@@ -369,13 +371,13 @@ def get_locally_installed_packages(encoding="utf-8"):
     """Enhanced package detection supporting conda, editable installs, and namespace packages."""
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    
+
     # Get packages from multiple sources
     packages.extend(_get_pip_packages(encoding, ignore))
     packages.extend(_get_conda_packages(encoding, ignore))
     packages.extend(_get_editable_packages(encoding, ignore))
     packages.extend(_get_namespace_packages(encoding, ignore))
-    
+
     # Remove duplicates while preserving order
     seen = set()
     unique_packages = []
@@ -384,7 +386,7 @@ def get_locally_installed_packages(encoding="utf-8"):
         if pkg_key not in seen:
             seen.add(pkg_key)
             unique_packages.append(pkg)
-    
+
     return unique_packages
 
 
@@ -392,61 +394,62 @@ def _get_pip_packages(encoding="utf-8", ignore=None):
     """Get packages from standard pip/setuptools installations."""
     if ignore is None:
         ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    
+
     packages = []
     for path in sys.path:
         if not os.path.exists(path):
             continue
-            
+
         for root, dirs, files in os.walk(path):
             # Look for dist-info and egg-info directories
             if any(suffix in root for suffix in [".dist-info", ".egg-info"]):
                 top_level_file = None
                 metadata_file = None
-                
+
                 # Find top_level.txt and METADATA/PKG-INFO
                 for item in files:
                     if "top_level" in item.lower():
                         top_level_file = os.path.join(root, item)
                     elif item in ["METADATA", "PKG-INFO"]:
                         metadata_file = os.path.join(root, item)
-                
+
                 if top_level_file:
                     try:
                         with open(top_level_file, "r", encoding=encoding) as f:
-                            top_level_modules = [m.strip() for m in f.read().strip().split("\n") if m.strip()]
+                            top_level_modules = [
+                                m.strip() for m in f.read().strip().split("\n") if m.strip()]
                     except (IOError, UnicodeDecodeError):
                         continue
                 else:
                     # Fallback: infer from package name
                     package_name = os.path.basename(root).split("-")[0]
                     top_level_modules = [package_name.replace("_", "").replace("-", "")]
-                
+
                 # Extract package name and version
                 package_parts = os.path.basename(root).split("-")
                 package_name = package_parts[0]
                 version = None
-                
+
                 if len(package_parts) > 1:
                     version = package_parts[1].replace(".dist", "").replace(".egg", "")
-                
+
                 # Try to get version from metadata if not found
                 if not version and metadata_file:
                     version = _extract_version_from_metadata(metadata_file, encoding)
-                
+
                 # Filter modules
                 filtered_modules = [
                     module for module in top_level_modules
                     if module and module not in ignore and package_name not in ignore
                 ]
-                
+
                 if filtered_modules:
                     packages.append({
                         "name": package_name,
                         "version": version,
                         "exports": filtered_modules,
                     })
-    
+
     return packages
 
 
@@ -454,51 +457,49 @@ def _get_conda_packages(encoding="utf-8", ignore=None):
     """Get packages from conda environments."""
     if ignore is None:
         ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    
+
     packages = []
-    
+
     # Check if we're in a conda environment
     conda_prefix = os.environ.get("CONDA_PREFIX")
     if not conda_prefix:
         return packages
-    
+
     # Look for conda-meta directory
     conda_meta_path = os.path.join(conda_prefix, "conda-meta")
     if not os.path.exists(conda_meta_path):
         return packages
-    
+
     try:
-        import json
-        
         for filename in os.listdir(conda_meta_path):
             if filename.endswith(".json"):
                 try:
                     with open(os.path.join(conda_meta_path, filename), "r", encoding=encoding) as f:
                         conda_info = json.load(f)
-                    
+
                     package_name = conda_info.get("name", "")
                     version = conda_info.get("version", "")
-                    
+
                     if package_name in ignore:
                         continue
-                    
+
                     # Try to map conda package to Python import name
                     import_names = _get_conda_import_mapping(package_name)
-                    
+
                     if import_names:
                         packages.append({
                             "name": package_name,
                             "version": version,
                             "exports": import_names,
                         })
-                        
+
                 except (json.JSONDecodeError, IOError):
                     continue
-                    
+
     except ImportError:
         # json module not available, skip conda detection
         pass
-    
+
     return packages
 
 
@@ -506,50 +507,50 @@ def _get_editable_packages(encoding="utf-8", ignore=None):
     """Get editable/development packages from .egg-link files."""
     if ignore is None:
         ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    
+
     packages = []
-    
+
     for path in sys.path:
         if not os.path.exists(path):
             continue
-            
+
         for filename in os.listdir(path):
             if filename.endswith(".egg-link"):
                 egg_link_path = os.path.join(path, filename)
                 package_name = filename[:-9]  # Remove .egg-link
-                
+
                 if package_name in ignore:
                     continue
-                
+
                 try:
                     with open(egg_link_path, "r", encoding=encoding) as f:
                         dev_path = f.readline().strip()
-                    
+
                     # Try to find setup.py or pyproject.toml for package info
                     setup_py = os.path.join(dev_path, "setup.py")
                     pyproject_toml = os.path.join(dev_path, "pyproject.toml")
-                    
+
                     import_names = []
                     version = None
-                    
+
                     if os.path.exists(setup_py):
                         import_names, version = _parse_setup_py(setup_py, package_name)
                     elif os.path.exists(pyproject_toml):
                         import_names, version = _parse_pyproject_toml(pyproject_toml, package_name)
-                    
+
                     if not import_names:
                         # Fallback: use package name
                         import_names = [package_name.replace("-", "_")]
-                    
+
                     packages.append({
                         "name": package_name,
                         "version": version,
                         "exports": import_names,
                     })
-                    
+
                 except (IOError, UnicodeDecodeError):
                     continue
-    
+
     return packages
 
 
@@ -557,36 +558,36 @@ def _get_namespace_packages(encoding="utf-8", ignore=None):
     """Get namespace packages (PEP 420) that don't have __init__.py files."""
     if ignore is None:
         ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    
+
     packages = []
-    
+
     for path in sys.path:
         if not os.path.exists(path):
             continue
-            
+
         for item in os.listdir(path):
             item_path = os.path.join(path, item)
-            
+
             # Check if it's a directory without __init__.py (namespace package)
-            if (os.path.isdir(item_path) and 
+            if (os.path.isdir(item_path) and
                 not os.path.exists(os.path.join(item_path, "__init__.py")) and
                 item not in ignore and
-                not item.startswith(".")):
-                
+                    not item.startswith(".")):
+
                 # Check if it contains Python files
                 has_python_files = False
                 for root, dirs, files in os.walk(item_path):
                     if any(f.endswith((".py", ".pyx")) for f in files):
                         has_python_files = True
                         break
-                
+
                 if has_python_files:
                     packages.append({
                         "name": item,
                         "version": None,
                         "exports": [item],
                     })
-    
+
     return packages
 
 
@@ -620,7 +621,7 @@ def _get_conda_import_mapping(conda_package_name):
         "python-dateutil": ["dateutil"],
         "msgpack-python": ["msgpack"],
     }
-    
+
     return conda_mappings.get(conda_package_name, [conda_package_name.replace("-", "_")])
 
 
@@ -629,27 +630,27 @@ def _parse_setup_py(setup_py_path, package_name):
     # This is a simplified parser - in practice, you'd want more robust parsing
     import_names = [package_name.replace("-", "_")]
     version = None
-    
+
     try:
         with open(setup_py_path, "r") as f:
             content = f.read()
-            
+
         # Look for version
         import re
         version_match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', content)
         if version_match:
             version = version_match.group(1)
-            
+
         # Look for packages
         packages_match = re.search(r'packages\s*=\s*\[([^\]]+)\]', content)
         if packages_match:
             packages_str = packages_match.group(1)
             packages_list = [p.strip().strip('"\'') for p in packages_str.split(',')]
             import_names = [p for p in packages_list if p]
-            
+
     except (IOError, UnicodeDecodeError):
         pass
-    
+
     return import_names, version
 
 
@@ -657,21 +658,21 @@ def _parse_pyproject_toml(pyproject_path, package_name):
     """Parse pyproject.toml to extract package info (simplified)."""
     import_names = [package_name.replace("-", "_")]
     version = None
-    
+
     try:
         # Simple TOML parsing without external dependencies
         with open(pyproject_path, "r") as f:
             content = f.read()
-            
+
         # Look for version in [tool.poetry] or [project] sections
         import re
         version_match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', content)
         if version_match:
             version = version_match.group(1)
-            
+
     except (IOError, UnicodeDecodeError):
         pass
-    
+
     return import_names, version
 
 
@@ -699,111 +700,113 @@ def get_import_local(imports, encoding="utf-8"):
 def get_transitive_dependencies(packages, max_depth=2):
     """
     Resolve transitive dependencies for the given packages.
-    
+
     Args:
         packages: List of package dictionaries with 'name' and 'version'
         max_depth: Maximum depth to resolve dependencies (default: 2)
-    
+
     Returns:
         List of additional packages that are transitive dependencies
     """
     if max_depth <= 0:
         return []
-    
+
     transitive_deps = set()
     processed_packages = set()
-    
+
     def _get_package_dependencies(package_name, current_depth=0):
         if current_depth >= max_depth or package_name in processed_packages:
             return
-        
+
         processed_packages.add(package_name)
-        
+
         try:
             # Try to get dependencies from local installation first
             deps = _get_local_dependencies(package_name)
-            
+
             if not deps:
                 # Fallback to PyPI metadata (limited to avoid too many requests)
                 deps = _get_pypi_dependencies(package_name)
-            
+
             for dep in deps:
-                dep_name = dep.split()[0].split('=')[0].split('<')[0].split('>')[0].split('!')[0].split('~')[0]
+                dep_name = dep.split()[0].split('=')[0].split(
+                    '<')[0].split('>')[0].split('!')[0].split('~')[0]
                 if dep_name and dep_name not in processed_packages:
                     transitive_deps.add(dep_name)
                     # Recursively get dependencies
                     _get_package_dependencies(dep_name, current_depth + 1)
-                    
+
         except Exception as e:
             logging.debug(f"Failed to get dependencies for {package_name}: {e}")
-    
+
     # Process each package
     for package in packages:
         _get_package_dependencies(package['name'])
-    
+
     # Convert to package format and filter out already included packages
     existing_names = {pkg['name'] for pkg in packages}
     result = []
-    
+
     for dep_name in transitive_deps:
         if dep_name not in existing_names:
             # Try to find version info
             local_packages = get_locally_installed_packages()
             version = None
-            
+
             for local_pkg in local_packages:
                 if local_pkg['name'] == dep_name:
                     version = local_pkg['version']
                     break
-            
+
             result.append({
                 'name': dep_name,
                 'version': version
             })
-    
+
     return result
 
 
 def _get_local_dependencies(package_name):
     """Get dependencies from locally installed package metadata."""
     dependencies = []
-    
+
     for path in sys.path:
         if not os.path.exists(path):
             continue
-            
+
         # Look for package metadata
         for root, dirs, files in os.walk(path):
-            if package_name.lower() in root.lower() and any(suffix in root for suffix in [".dist-info", ".egg-info"]):
+            if package_name.lower() in root.lower() and any(
+                    suffix in root for suffix in [".dist-info", ".egg-info"]):
                 # Look for METADATA or requires.txt
                 metadata_files = ["METADATA", "PKG-INFO", "requires.txt"]
-                
+
                 for metadata_file in metadata_files:
                     metadata_path = os.path.join(root, metadata_file)
                     if os.path.exists(metadata_path):
                         try:
                             with open(metadata_path, "r", encoding="utf-8") as f:
                                 content = f.read()
-                                
+
                             # Parse dependencies from metadata
                             if metadata_file in ["METADATA", "PKG-INFO"]:
                                 dependencies.extend(_parse_metadata_dependencies(content))
                             elif metadata_file == "requires.txt":
                                 dependencies.extend(_parse_requires_txt(content))
-                                
+
                         except (IOError, UnicodeDecodeError):
                             continue
-                            
+
                 if dependencies:
                     break
-    
+
     return dependencies
 
 
 def _parse_metadata_dependencies(content):
     """Parse dependencies from METADATA or PKG-INFO content."""
     dependencies = []
-    
+
     for line in content.split('\n'):
         line = line.strip()
         if line.startswith('Requires-Dist:'):
@@ -812,45 +815,44 @@ def _parse_metadata_dependencies(content):
             dep = dep.split(';')[0].strip()
             if dep:
                 dependencies.append(dep)
-    
+
     return dependencies
 
 
 def _parse_requires_txt(content):
     """Parse dependencies from requires.txt content."""
     dependencies = []
-    
+
     for line in content.split('\n'):
         line = line.strip()
         if line and not line.startswith('#'):
             dependencies.append(line)
-    
+
     return dependencies
 
 
 def _get_pypi_dependencies(package_name):
     """Get dependencies from PyPI metadata (limited use to avoid rate limiting)."""
     dependencies = []
-    
+
     try:
-        import json
         response = requests.get(f"https://pypi.org/pypi/{package_name}/json", timeout=5)
-        
+
         if response.status_code == 200:
             data = response.json()
             info = data.get('info', {})
             requires_dist = info.get('requires_dist', [])
-            
+
             if requires_dist:
                 for req in requires_dist:
                     # Remove environment markers
                     dep = req.split(';')[0].strip()
                     if dep:
                         dependencies.append(dep)
-                        
+
     except Exception as e:
         logging.debug(f"Failed to get PyPI dependencies for {package_name}: {e}")
-    
+
     return dependencies
 
 
@@ -1069,7 +1071,7 @@ def init(args):
     # Enhanced import detection
     if enhanced_detection:
         logging.info("Using enhanced detection for conda packages and dynamic imports")
-    
+
     candidates = get_all_imports(
         input_path,
         encoding=encoding,
@@ -1078,7 +1080,7 @@ def init(args):
     )
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
-    
+
     pypi_server = "https://pypi.python.org/pypi/"
     proxy = None
     if args["--pypi-server"]:
@@ -1111,7 +1113,7 @@ def init(args):
         ]
 
         imports = local + get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
-    
+
     # Add transitive dependencies if requested
     if include_transitive:
         logging.info(f"Resolving transitive dependencies (depth: {transitive_depth})")
@@ -1124,7 +1126,7 @@ def init(args):
                 logging.info("No additional transitive dependencies found")
         except Exception as e:
             logging.warning(f"Failed to resolve transitive dependencies: {e}")
-    
+
     # sort imports based on lowercase name of package, similar to `pip freeze`.
     imports = sorted(imports, key=lambda x: x["name"].lower())
 
