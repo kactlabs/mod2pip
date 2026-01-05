@@ -3,6 +3,30 @@
 History
 -------
 
+0.6.0 (2025-01-05)
+--------------------
+
+* Remove poetry dependency, switch to pip-only workflow
+* Fix Python 3.13 compatibility issues in CI/CD
+* Enhanced GitHub Actions workflow with better dependency management
+* Add comprehensive development guide (DEVELOPMENT.md)
+* Improve tox configuration with version-specific dependencies
+* Add requirements-dev.txt for simpler development setup
+* Update Makefile with pip-based commands
+* Maintain all enhanced features from 0.5.0 (dynamic imports, conda support, transitive dependencies)
+
+0.5.0 (2024-12-XX)
+--------------------
+
+* Enhanced import detection for dynamic imports (__import__, importlib.import_module)
+* Added conda environment support with conda-meta package detection
+* Implemented transitive dependency resolution (experimental)
+* Enhanced local package detection (editable packages, namespace packages)
+* Fixed bytes/string compatibility for notebook processing
+* Renamed from pipreqs to mod2pip throughout codebase
+* Added comprehensive test coverage and flake8 compliance
+* Improved error handling for invalid files
+
 0.4.11 (2020-03-29)
 --------------------
 

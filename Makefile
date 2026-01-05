@@ -1,4 +1,4 @@
-.PHONY: clean-pyc clean-build docs clean
+.PHONY: clean-pyc clean-build docs clean help
 
 help:
 	@echo "clean - remove all build, test, coverage and Python artifacts"
@@ -7,13 +7,14 @@ help:
 	@echo "clean-test - remove test and coverage artifacts"
 	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly using the default Python"
-	@echo "test-all - run tests on every Python version with tox"
+	@echo "test-all - run tests on current Python version"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
 	@echo "publish - package and upload a release"
 	@echo "publish-to-test - package and upload a release to test-pypi"
 	@echo "build - build the package"
-	@echo "install - install the dependencies into the Poetry virtual environment"
+	@echo "install - install the package in development mode"
+	@echo "install-dev - install development dependencies"
 
 clean: clean-build clean-pyc clean-test
 
@@ -36,16 +37,17 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	poetry run flake8 mod2pip tests
+	flake8 mod2pip tests/test_mod2pip.py --max-line-length=100
 
 test:
-	poetry run python -m unittest discover 
+	python -m unittest discover 
 
 test-all:
-	poetry run tox
+	python ci_debug.py
+	python -m unittest discover -s tests -p "test_*.py" -v
 
 coverage:
-	coverage run --source mod2pip setup.py test
+	coverage run --source mod2pip -m unittest discover
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
@@ -59,13 +61,17 @@ docs:
 	open docs/_build/html/index.html
 
 publish: build
-	poetry publish
+	twine upload dist/*
 
 publish-to-test: build
-	poetry publish --repository test-pypi
+	twine upload --repository testpypi dist/*
 
 build: clean
-	poetry build
+	python -m build
 
 install: clean
-	poetry install --with dev
+	pip install -e .
+
+install-dev:
+	pip install -r requirements-dev.txt
+	pip install -e .

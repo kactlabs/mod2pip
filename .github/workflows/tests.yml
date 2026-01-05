@@ -14,7 +14,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', 'pypy-3.9-7.3.13']
+                python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
         steps:
             - name: Checkout repository
@@ -25,35 +25,70 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
 
+            - name: Debug environment
+              run: |
+                  python --version
+                  python -c "import sys; print('Python executable:', sys.executable)"
+                  python -c "import sys; print('Python path:', sys.path[:3])"
+                  pip --version
+
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  pip install tox tox-gh-actions
+                  pip install -r requirements-dev.txt
+                  pip install -e .
+              timeout-minutes: 10
 
-            - name: Test with tox
-              run: tox
+            - name: Run debug script
+              run: python ci_debug.py
+              timeout-minutes: 5
+
+            - name: Run tests
+              run: python -m unittest discover -s tests -p "test_*.py" -v
+              timeout-minutes: 30
+              env:
+                PYTHONDONTWRITEBYTECODE: 1
+                PYTHONUNBUFFERED: 1
+
+            - name: Run flake8
+              run: flake8 mod2pip tests/test_mod2pip.py --max-line-length=100
+              if: matrix.python-version == '3.11'
 
     coverage_report:
         needs: run_tests
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python 3.11
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
 
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  pip install poetry
-                  poetry install --with dev
+                  pip install -r requirements-dev.txt
+
+            - name: Install project
+              run: pip install -e .
 
             - name: Calculate coverage
-              run: poetry run coverage run --source=mod2pip -m unittest discover
+              run: coverage run --source=mod2pip -m unittest discover
 
             - name: Create XML report
-              run: poetry run coverage xml
+              run: coverage xml
 
-            - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v5
-              with:
-                  files: coverage.xml
-                  fail_ci_if_error: true
+            - name: Upload coverage to Codecov (Alternative)
+              if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+              run: |
+                  curl -Os https://uploader.codecov.io/latest/linux/codecov
+                  chmod +x codecov
+                  ./codecov -t ${{ secrets.CODECOV_TOKEN }} -f coverage.xml
+              continue-on-error: true

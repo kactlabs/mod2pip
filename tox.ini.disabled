@@ -1,0 +1,114 @@
+[tox]
+isolated_build = true
+envlist = py39, py310, py311, py312, py313, pypy3, flake8
+
+[gh-actions]
+python =
+    3.9: py39
+    3.10: py310
+    3.11: py311
+    3.12: py312
+    3.13: py313
+    pypy-3.9-7.3.13: pypy3
+
+[testenv]
+setenv =
+    PYTHONPATH = {toxinidir}:{toxinidir}/mod2pip
+    PIP_DISABLE_PIP_VERSION_CHECK = 1
+    # CI environment optimizations
+    PYTHONDONTWRITEBYTECODE = 1
+    PYTHONUNBUFFERED = 1
+    # Reduce network timeouts
+    PIP_TIMEOUT = 60
+    PIP_RETRIES = 3
+deps =
+    yarg>=0.1.9
+    docopt>=0.6.2
+    requests>=2.25.0
+    # Python version specific dependencies for better compatibility
+    nbconvert>=7.11.0,<8.0.0;python_version<'3.13'
+    nbconvert>=7.16.0;python_version>='3.13'
+    ipython>=7.16.0,<8.0.0;python_version=='3.9'
+    ipython>=8.0.0,<8.19.0;python_version>='3.10' and python_version<'3.13'
+    ipython>=8.18.0;python_version>='3.13'
+allowlist_externals = 
+    python
+    echo
+commands =
+    echo "=== Starting tests for Python {envname} ==="
+    python -c "import sys; print(f'Testing on Python {sys.version}')"
+    python ci_debug.py
+    echo "=== Running unit tests ==="
+    python -m unittest discover -s tests -p "test_*.py" -v --buffer
+    echo "=== Tests completed successfully ==="
+
+[testenv:flake8]
+deps = flake8
+commands = flake8 mod2pip tests/test_mod2pip.py --max-line-length=100
+
+[testenv:py313]
+setenv =
+    PYTHONPATH = {toxinidir}:{toxinidir}/mod2pip
+    PIP_DISABLE_PIP_VERSION_CHECK = 1
+    PIP_NO_WARN_SCRIPT_LOCATION = 1
+    PYTHONDONTWRITEBYTECODE = 1
+    PYTHONUNBUFFERED = 1
+deps =
+    yarg>=0.1.9
+    docopt>=0.6.2
+    requests>=2.25.0
+    # Use more recent versions for Python 3.13 compatibility
+    nbconvert>=7.16.0
+    ipython>=8.18.0
+    # Add explicit dependencies that might be missing
+    setuptools>=61.0
+    wheel
+allowlist_externals = 
+    python
+    echo
+commands =
+    echo "=== Starting tests for Python 3.13 ==="
+    python -c "import sys; print(f'Testing on Python {sys.version}')"
+    python ci_debug.py
+    echo "=== Running unit tests ==="
+    python -m unittest discover -s tests -p "test_*.py" -v --buffer
+    echo "=== Tests completed successfully ==="
+
+[testenv:py311]
+# Specific configuration for Python 3.11 with conservative settings
+setenv =
+    PYTHONPATH = {toxinidir}:{toxinidir}/mod2pip
+    PIP_DISABLE_PIP_VERSION_CHECK = 1
+    PYTHONDONTWRITEBYTECODE = 1
+    PYTHONUNBUFFERED = 1
+    PIP_TIMEOUT = 120
+deps =
+    yarg>=0.1.9
+    docopt>=0.6.2
+    requests>=2.25.0
+    nbconvert>=7.11.0,<8.0.0
+    ipython>=8.0.0,<8.19.0
+    setuptools>=61.0
+    wheel
+allowlist_externals = 
+    python
+    echo
+commands =
+    echo "=== Starting tests for Python 3.11 ==="
+    python -c "import sys; print(f'Testing on Python {sys.version}')"
+    python ci_debug.py
+    echo "=== Running unit tests ==="
+    python -m unittest discover -s tests -p "test_*.py" -v --buffer
+    echo "=== Tests completed successfully ==="
+
+[flake8]
+exclude =
+    tests/_data/
+    tests/_data_clean/
+    tests/_data_duplicated_deps/
+    tests/_data_ignore/
+    tests/_invalid_data/
+    tests/_data_notebook/
+    tests/_data_pyw/
+    tests/_invalid_data_notebook/
+max-line-length = 100
