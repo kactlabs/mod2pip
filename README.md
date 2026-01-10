@@ -75,3 +75,17 @@ docopt==0.6.2
 - `pip freeze` only saves the packages that are installed with `pip install` in your environment.
 - `pip freeze` saves all packages in the environment including those that you don't use in your current project (if you don't have `virtualenv`).
 - Sometimes you just need to create `requirements.txt` for a new project without installing modules.
+
+## Citing mod2pip
+
+If you find mod2pip useful in your research and wish to cite it, please use the following BibTex entry:
+
+```bibtex
+@software{mod2pip2024,
+   author = {Raja CSP Raman},
+   title = {mod2pip: Generate requirements.txt file for any project based on imports},
+   url = {https://github.com/kactlabs/mod2pip/},
+   version = {0.6.0},
+   year = {2024},
+}
+```
