@@ -11,8 +11,9 @@ exclude =
     venv,
     env
 ignore = 
-    E501,  # line too long (handled by max-line-length)
-    W503,  # line break before binary operator
-    W293,  # blank line contains whitespace
-    W291,  # trailing whitespace
-    E129   # visually indented line with same indent as next logical line
+    E501,
+    W503,
+    W504,
+    W293,
+    W291,
+    E129
