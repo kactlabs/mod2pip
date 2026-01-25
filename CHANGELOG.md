@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.0] - 2025-01-25
+## [0.8.0] - 2025-01-25
 
 ### Added
 - **New `--lib` flag**: Add specific libraries with their installed versions to requirements.txt
@@ -18,9 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed `--print` flag behavior when used with `--lib` to correctly output to stdout without checking for existing requirements.txt
 - Improved library name normalization for better package detection
+- Fixed flake8 linting issues for better code quality
+- Corrected publish.sh script (was referencing wrong project name)
 
 ### Changed
-- Updated version from 0.6.0 to 0.7.0
+- Updated version from 0.6.0 to 0.8.0
+- Added `.flake8` configuration file for consistent code style
+- Improved code formatting to meet PEP 8 standards
+- Enhanced error messages and logging for better user experience
+
+## [0.7.0] - 2025-01-25
+
+### Note
+- Version 0.7.0 was skipped in favor of 0.8.0 to include additional fixes
 
 ## [0.6.0] - 2024
 
@@ -51,7 +61,7 @@ See [HISTORY.rst](HISTORY.rst) for earlier version history.
 
 ## Release Notes
 
-### How to use the new `--lib` feature (v0.7.0)
+### How to use the new `--lib` feature (v0.8.0)
 
 ```bash
 # Add specific libraries with their versions
@@ -69,5 +79,6 @@ mod2pip --force --lib flask,django --mode no-pin  # No version
 mod2pip --force --lib langchain --savepath my-requirements.txt
 ```
 
+[0.8.0]: https://github.com/kactlabs/mod2pip/compare/v0.6.0...v0.8.0
 [0.7.0]: https://github.com/kactlabs/mod2pip/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/kactlabs/mod2pip/releases/tag/v0.6.0
