@@ -26,6 +26,7 @@ Options:
     --print               Output the list of requirements in the standard
                           output
     --force               Overwrite existing requirements.txt
+    --append              Append to existing requirements.txt (use with --lib)
     --diff <file>         Compare modules in requirements.txt to project
                           imports
     --clean <file>        Clean up requirements.txt by removing modules
@@ -347,8 +348,9 @@ def ipynb_2_py(file_name, encoding="utf-8"):
     return body.encode(encoding)
 
 
-def generate_requirements_file(path, imports, symbol):
-    with _open(path, "w") as out_file:
+def generate_requirements_file(path, imports, symbol, append=False):
+    mode = "a" if append else "w"
+    with _open(path, mode) as out_file:
         logging.debug(
             "Writing {num} requirements: {imports} to {file}".format(
                 num=len(imports),
@@ -1182,12 +1184,19 @@ def init(args):
         # Get version information for specified libraries
         imports = get_specific_libraries(lib_list, encoding=encoding)
 
-        # Check if requirements.txt exists and --force is not set (only if not printing)
-        if not args["--print"] and not args["--force"] and os.path.exists(path):
-            logging.warning(
-                "requirements.txt already exists. Use --force to overwrite it."
-            )
-            return
+        # Determine append mode
+        append_mode = args.get("--append", False)
+
+        # Check if requirements.txt exists
+        if not args["--print"] and os.path.exists(path):
+            if not args["--force"] and not append_mode:
+                logging.warning(
+                    "requirements.txt already exists. "
+                    "Use --force to overwrite or --append to add to it."
+                )
+                return
+            elif append_mode:
+                logging.info(f"Appending libraries to existing {path}")
 
         # Determine the symbol based on mode
         if args["--mode"]:
@@ -1196,7 +1205,8 @@ def init(args):
                 imports, symbol = dynamic_versioning(scheme, imports)
             else:
                 raise ValueError(
-                    "Invalid argument for mode flag, use 'compat', 'gt' or 'no-pin' instead"
+                    "Invalid argument for mode flag, "
+                    "use 'compat', 'gt' or 'no-pin' instead"
                 )
         else:
             symbol = "=="
@@ -1209,8 +1219,9 @@ def init(args):
             output_requirements(imports, symbol)
             logging.info("Successfully output requirements")
         else:
-            generate_requirements_file(path, imports, symbol)
-            logging.info("Successfully saved requirements file in " + path)
+            generate_requirements_file(path, imports, symbol, append=append_mode)
+            action = "appended to" if append_mode else "saved in"
+            logging.info(f"Successfully {action} requirements file {path}")
 
         return
 
