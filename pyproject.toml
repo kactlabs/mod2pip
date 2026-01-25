@@ -1,6 +1,6 @@
 [project]
 name = "mod2pip"
-version = "0.6.0"
+version = "0.7.0"
 description = "Enhanced pip requirements.txt generator with dynamic import detection and conda support"
 authors = [
     { name = "Raja CSP Raman", email = "raja.csp@gmail.com" }
