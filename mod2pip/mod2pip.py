@@ -349,6 +349,40 @@ def ipynb_2_py(file_name, encoding="utf-8"):
 
 
 def generate_requirements_file(path, imports, symbol, append=False):
+    existing_packages = set()
+    
+    # If appending, read existing packages to avoid duplicates
+    if append and os.path.exists(path):
+        try:
+            with open(path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        # Extract package name (before ==, >=, ~=, etc.)
+                        pkg_name = re.split(r'[=<>~!]', line)[0].strip()
+                        if pkg_name:
+                            existing_packages.add(pkg_name.lower())
+        except IOError:
+            pass
+    
+    # Filter out packages that already exist
+    if append and existing_packages:
+        original_count = len(imports)
+        imports = [
+            pkg for pkg in imports
+            if pkg["name"].lower() not in existing_packages
+        ]
+        skipped = original_count - len(imports)
+        if skipped > 0:
+            logging.info(
+                f"Skipped {skipped} package(s) already in requirements.txt"
+            )
+    
+    # If no new packages to add, return early
+    if not imports:
+        logging.info("All specified packages already exist in requirements.txt")
+        return
+    
     mode = "a" if append else "w"
     with _open(path, mode) as out_file:
         logging.debug(
