@@ -37,9 +37,12 @@ Options:
                           <no-pin> | e.g. Flask
     --scan-notebooks      Look for imports in jupyter notebook files.
     --include-transitive  Include transitive dependencies (experimental).
-    --transitive-depth <n> Maximum depth for transitive dependency resolution (default: 2).
-    --enhanced-detection  Enable enhanced import detection (dynamic imports, conda packages).
-    --lib <packages>...   Add specific libraries with their installed versions (comma-separated).
+    --transitive-depth <n> Maximum depth for transitive dependency
+                          resolution (default: 2).
+    --enhanced-detection  Enable enhanced import detection (dynamic
+                          imports, conda packages).
+    --lib <packages>...   Add specific libraries with their installed
+                          versions (comma-separated).
 """
 from contextlib import contextmanager
 import os
@@ -56,7 +59,10 @@ from yarg.exceptions import HTTPError
 
 from mod2pip import __version__
 
-REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
+REGEXP = [
+    re.compile(r"^import (.+)$"),
+    re.compile(r"^from ((?!\.+).*?) import (?:.*)$")
+]
 DEFAULT_EXTENSIONS = [".py", ".pyw"]
 
 scan_noteboooks = False
@@ -64,7 +70,8 @@ scan_noteboooks = False
 
 class NbconvertNotInstalled(ImportError):
     default_message = (
-        "In order to scan jupyter notebooks, please install the nbconvert and ipython libraries"
+        "In order to scan jupyter notebooks, please install the "
+        "nbconvert and ipython libraries"
     )
 
     def __init__(self, message=default_message):
@@ -102,7 +109,9 @@ def _open(filename=None, mode="r"):
             file.close()
 
 
-def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True):
+def get_all_imports(
+    path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True
+):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -132,8 +141,13 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        py_files = [file for file in files if file_ext_is_allowed(file, DEFAULT_EXTENSIONS)]
-        candidates.extend([os.path.splitext(filename)[0] for filename in py_files])
+        py_files = [
+            file for file in files
+            if file_ext_is_allowed(file, DEFAULT_EXTENSIONS)
+        ]
+        candidates.extend([
+            os.path.splitext(filename)[0] for filename in py_files
+        ])
 
         files = [fn for fn in files if file_ext_is_allowed(fn, extensions)]
 
@@ -217,10 +231,14 @@ def _get_dynamic_imports(contents):
         r'(?:exec|eval)\s*\(\s*["\'].*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)')
 
     # Pattern 4: Dynamic imports in f-strings or format strings
-    fstring_import_pattern = re.compile(r'f["\'].*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)')
+    fstring_import_pattern = re.compile(
+        r'f["\'].*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)'
+    )
 
     # Pattern 5: Conditional imports (try/except blocks)
-    try_import_pattern = re.compile(r'try\s*:.*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.DOTALL)
+    try_import_pattern = re.compile(
+        r'try\s*:.*?import\s+([a-zA-Z_][a-zA-Z0-9_]*)', re.DOTALL
+    )
 
     # Pattern 6: Late imports (imports inside functions)
     function_import_pattern = re.compile(
@@ -237,9 +255,12 @@ def _get_dynamic_imports(contents):
             if match and not match.startswith('.'):  # Skip relative imports
                 imports.add(match)
 
-    # Additional pattern: Look for string literals that might be module names
-    # This catches cases like: module_name = "requests"; __import__(module_name)
-    string_literals = re.findall(r'["\']([a-zA-Z_][a-zA-Z0-9_]*)["\']', contents)
+    # Additional pattern: Look for string literals that might be
+    # module names. This catches cases like:
+    # module_name = "requests"; __import__(module_name)
+    string_literals = re.findall(
+        r'["\']([a-zA-Z_][a-zA-Z0-9_]*)["\']', contents
+    )
     potential_modules = set()
 
     for literal in string_literals:
@@ -276,7 +297,7 @@ def _get_regex_imports(contents):
 
 
 def _get_common_package_names():
-    """Return a set of common package names to help identify dynamic imports."""
+    """Return common package names to help identify dynamic imports."""
     return {
         'requests', 'numpy', 'pandas', 'matplotlib', 'scipy', 'sklearn',
         'tensorflow', 'torch', 'flask', 'django', 'fastapi', 'sqlalchemy',
@@ -289,7 +310,8 @@ def _get_common_package_names():
 
 
 def get_file_extensions():
-    return DEFAULT_EXTENSIONS + [".ipynb"] if scan_noteboooks else DEFAULT_EXTENSIONS
+    extensions = [".ipynb"] if scan_noteboooks else []
+    return DEFAULT_EXTENSIONS + extensions
 
 
 def read_file_content(file_name: str, encoding="utf-8"):
@@ -329,13 +351,16 @@ def generate_requirements_file(path, imports, symbol):
     with _open(path, "w") as out_file:
         logging.debug(
             "Writing {num} requirements: {imports} to {file}".format(
-                num=len(imports), file=path, imports=", ".join([x["name"] for x in imports])
+                num=len(imports),
+                file=path,
+                imports=", ".join([x["name"] for x in imports])
             )
         )
         fmt = "{name}" + symbol + "{version}"
         out_file.write(
             "\n".join(
-                fmt.format(**item) if item["version"] else "{name}".format(**item)
+                fmt.format(**item) if item["version"]
+                else "{name}".format(**item)
                 for item in imports
             )
             + "\n"
@@ -346,25 +371,35 @@ def output_requirements(imports, symbol):
     generate_requirements_file("-", imports, symbol)
 
 
-def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+def get_imports_info(
+    imports, pypi_server="https://pypi.python.org/pypi/", proxy=None
+):
     result = []
 
     for item in imports:
         try:
             logging.warning(
-                'Import named "%s" not found locally. ' "Trying to resolve it at the PyPI server.",
+                'Import named "%s" not found locally. '
+                "Trying to resolve it at the PyPI server.",
                 item,
             )
-            response = requests.get("{0}{1}/json".format(pypi_server, item), proxies=proxy)
+            response = requests.get(
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy
+            )
             if response.status_code == 200:
                 if hasattr(response.content, "decode"):
                     data = json2package(response.content.decode())
                 else:
                     data = json2package(response.content)
             elif response.status_code >= 300:
-                raise HTTPError(status_code=response.status_code, reason=response.reason)
+                raise HTTPError(
+                    status_code=response.status_code,
+                    reason=response.reason
+                )
         except HTTPError:
-            logging.warning('Package "%s" does not exist or network problems', item)
+            logging.warning(
+                'Package "%s" does not exist or network problems', item
+            )
             continue
         logging.warning(
             'Import named "%s" was resolved to "%s:%s" package (%s).\n'
@@ -380,7 +415,8 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
 
 
 def get_locally_installed_packages(encoding="utf-8"):
-    """Enhanced package detection supporting conda, editable installs, and namespace packages."""
+    """Enhanced package detection supporting conda, editable installs,
+    and namespace packages."""
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
 
@@ -908,26 +944,33 @@ def get_specific_libraries(lib_names, encoding="utf-8"):
             continue
 
         found = False
-        # Normalize the library name for comparison (handle hyphens vs underscores)
+        # Normalize library name (handle hyphens vs underscores)
         normalized_lib_name = lib_name.lower().replace("-", "_")
-        
+
         # Try to find the library in local packages
         for package in local_packages:
             # Normalize package name and exports for comparison
             normalized_pkg_name = package["name"].lower().replace("-", "_")
-            normalized_exports = [exp.lower().replace("-", "_") for exp in package["exports"]]
-            
+            normalized_exports = [
+                exp.lower().replace("-", "_")
+                for exp in package["exports"]
+            ]
+
             # Check if library name matches package name or any export
-            if (normalized_pkg_name == normalized_lib_name or 
-                lib_name.lower() == package["name"].lower() or
-                normalized_lib_name in normalized_exports or
-                lib_name.lower() in [exp.lower() for exp in package["exports"]]):
-                
-                result.append({"name": package["name"], "version": package["version"]})
+            if (normalized_pkg_name == normalized_lib_name or
+                    lib_name.lower() == package["name"].lower() or
+                    normalized_lib_name in normalized_exports or
+                    lib_name.lower() in [
+                        exp.lower() for exp in package["exports"]]):
+
+                result.append({
+                    "name": package["name"],
+                    "version": package["version"]
+                })
                 found = True
                 logging.info(
-                    f'Found library "{lib_name}" as package "{package["name"]}" '
-                    f'version {package["version"]}'
+                    f'Found library "{lib_name}" as package '
+                    f'"{package["name"]}" version {package["version"]}'
                 )
                 break
 
