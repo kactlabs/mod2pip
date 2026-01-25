@@ -39,6 +39,7 @@ Options:
     --include-transitive  Include transitive dependencies (experimental).
     --transitive-depth <n> Maximum depth for transitive dependency resolution (default: 2).
     --enhanced-detection  Enable enhanced import detection (dynamic imports, conda packages).
+    --lib <packages>...   Add specific libraries with their installed versions (comma-separated).
 """
 from contextlib import contextmanager
 import os
@@ -888,6 +889,58 @@ def get_pkg_names(pkgs):
     return sorted(result, key=lambda s: s.lower())
 
 
+def get_specific_libraries(lib_names, encoding="utf-8"):
+    """Get version information for specific libraries.
+
+    Args:
+        lib_names (List[str]): List of library names to look up.
+        encoding (str): Encoding for file operations.
+
+    Returns:
+        List[dict]: List of dictionaries with 'name' and 'version' keys.
+    """
+    result = []
+    local_packages = get_locally_installed_packages(encoding=encoding)
+
+    for lib_name in lib_names:
+        lib_name = lib_name.strip()
+        if not lib_name:
+            continue
+
+        found = False
+        # Normalize the library name for comparison (handle hyphens vs underscores)
+        normalized_lib_name = lib_name.lower().replace("-", "_")
+        
+        # Try to find the library in local packages
+        for package in local_packages:
+            # Normalize package name and exports for comparison
+            normalized_pkg_name = package["name"].lower().replace("-", "_")
+            normalized_exports = [exp.lower().replace("-", "_") for exp in package["exports"]]
+            
+            # Check if library name matches package name or any export
+            if (normalized_pkg_name == normalized_lib_name or 
+                lib_name.lower() == package["name"].lower() or
+                normalized_lib_name in normalized_exports or
+                lib_name.lower() in [exp.lower() for exp in package["exports"]]):
+                
+                result.append({"name": package["name"], "version": package["version"]})
+                found = True
+                logging.info(
+                    f'Found library "{lib_name}" as package "{package["name"]}" '
+                    f'version {package["version"]}'
+                )
+                break
+
+        if not found:
+            logging.warning(
+                f'Library "{lib_name}" not found in local installation. '
+                f"It will be added without version information."
+            )
+            result.append({"name": lib_name, "version": None})
+
+    return result
+
+
 def get_name_without_alias(name):
     if "import " in name:
         match = REGEXP[0].match(name.strip())
@@ -1053,6 +1106,7 @@ def init(args):
     include_transitive = args.get("--include-transitive", False)
     transitive_depth = int(args.get("--transitive-depth") or 2)
     enhanced_detection = args.get("--enhanced-detection", False)
+    lib_names = args.get("--lib")
 
     scan_noteboooks = args.get("--scan-notebooks", False)
     handle_scan_noteboooks()
@@ -1070,6 +1124,54 @@ def init(args):
     path = (
         args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
     )
+
+    # Handle --lib flag for adding specific libraries
+    if lib_names:
+        # Parse comma-separated library names
+        lib_list = [lib.strip() for lib in lib_names.split(",") if lib.strip()]
+
+        if not lib_list:
+            logging.error("No valid library names provided with --lib flag")
+            return
+
+        logging.info(f"Looking up versions for libraries: {', '.join(lib_list)}")
+
+        # Get version information for specified libraries
+        imports = get_specific_libraries(lib_list, encoding=encoding)
+
+        # Check if requirements.txt exists and --force is not set (only if not printing)
+        if not args["--print"] and not args["--force"] and os.path.exists(path):
+            logging.warning(
+                "requirements.txt already exists. Use --force to overwrite it."
+            )
+            return
+
+        # Determine the symbol based on mode
+        if args["--mode"]:
+            scheme = args.get("--mode")
+            if scheme in ["compat", "gt", "no-pin"]:
+                imports, symbol = dynamic_versioning(scheme, imports)
+            else:
+                raise ValueError(
+                    "Invalid argument for mode flag, use 'compat', 'gt' or 'no-pin' instead"
+                )
+        else:
+            symbol = "=="
+
+        # Sort imports
+        imports = sorted(imports, key=lambda x: x["name"].lower())
+
+        # Generate or print requirements
+        if args["--print"]:
+            output_requirements(imports, symbol)
+            logging.info("Successfully output requirements")
+        else:
+            generate_requirements_file(path, imports, symbol)
+            logging.info("Successfully saved requirements file in " + path)
+
+        return
+
+    # Original flow for scanning project imports
     if (
         not args["--print"]
         and not args["--savepath"]
