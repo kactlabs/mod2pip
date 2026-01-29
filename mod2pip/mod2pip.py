@@ -104,6 +104,17 @@ def _open(filename=None, mode="r"):
         else:
             raise ValueError("Invalid mode for file: {}".format(mode))
     else:
+        # Create parent directories if they don't exist
+        if "w" in mode or "a" in mode:
+            parent_dir = os.path.dirname(filename)
+            if parent_dir and not os.path.exists(parent_dir):
+                try:
+                    os.makedirs(parent_dir, exist_ok=True)
+                    logging.debug(f"Created directory: {parent_dir}")
+                except OSError as e:
+                    logging.error(f"Failed to create directory {parent_dir}: {e}")
+                    raise
+        
         file = open(filename, mode)
 
     try:
@@ -449,7 +460,7 @@ def get_imports_info(
             data.latest_release_id,
             data.pypi_url,
         )
-        result.append({"name": item, "version": data.latest_release_id})
+        result.append({"name": data.name, "version": data.latest_release_id})
     return result
 
 
