@@ -61,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Graceful syntax error handling**: Falls back to regex parsing when AST parsing fails (supports legacy Python 2 code)
 - **Python 3.13 support**: Fully tested and compatible with Python 3.9-3.13
 
+
 ### Documentation
 - Updated `README.md` with `--validate-env` examples and comprehensive list of 100+ supported patterns
 - Updated `CHANGELOG.md` with v0.11.0 release notes
