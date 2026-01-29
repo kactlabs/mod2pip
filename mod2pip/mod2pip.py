@@ -44,6 +44,8 @@ Options:
                           imports, conda packages).
     --lib <packages>...   Add specific libraries with their installed
                           versions (comma-separated).
+    --generate-env        Scan Python files for environment variables and
+                          generate .env and .env.sample files.
 """
 from contextlib import contextmanager
 import os
@@ -1020,6 +1022,393 @@ def get_specific_libraries(lib_names, encoding="utf-8"):
     return result
 
 
+def scan_for_env_variables(path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True):
+    """Scan Python files for environment variable usage.
+
+    Args:
+        path (str): Root path to scan for Python files.
+        encoding (str): File encoding to use.
+        extra_ignore_dirs (list): Additional directories to ignore.
+        follow_links (bool): Whether to follow symbolic links.
+
+    Returns:
+        dict: Dictionary with env var names as keys and metadata as values.
+    """
+    env_vars = {}
+    ignore_dirs = [
+        ".hg", ".svn", ".git", ".tox", "__pycache__",
+        "env", "venv", ".venv", ".ipynb_checkpoints",
+        "node_modules", "dist", "build", ".eggs"
+    ]
+
+    if extra_ignore_dirs:
+        ignore_dirs_parsed = []
+        for e in extra_ignore_dirs:
+            ignore_dirs_parsed.append(os.path.basename(os.path.realpath(e)))
+        ignore_dirs.extend(ignore_dirs_parsed)
+
+    # Patterns to match environment variable access
+    patterns = [
+        # os.environ['VAR'], os.environ["VAR"]
+        re.compile(r'os\.environ\[["\']([A-Z_][A-Z0-9_]*?)["\']\]'),
+        # os.environ.get('VAR'), os.environ.get("VAR")
+        re.compile(r'os\.environ\.get\(["\']([A-Z_][A-Z0-9_]*?)["\']'),
+        # os.getenv('VAR'), os.getenv("VAR")
+        re.compile(r'os\.getenv\(["\']([A-Z_][A-Z0-9_]*?)["\']'),
+        # environ['VAR'], environ.get('VAR')
+        re.compile(r'environ\[["\']([A-Z_][A-Z0-9_]*?)["\']\]'),
+        re.compile(r'environ\.get\(["\']([A-Z_][A-Z0-9_]*?)["\']'),
+    ]
+
+    walk = os.walk(path, followlinks=follow_links)
+    for root, dirs, files in walk:
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+
+        py_files = [f for f in files if f.endswith('.py')]
+
+        for file_name in py_files:
+            file_path = os.path.join(root, file_name)
+            relative_path = os.path.relpath(file_path, path)
+
+            try:
+                with open(file_path, 'r', encoding=encoding) as f:
+                    content = f.read()
+                    lines = content.split('\n')
+
+                for pattern in patterns:
+                    for match in pattern.finditer(content):
+                        var_name = match.group(1)
+                        
+                        # Find the line number
+                        line_num = content[:match.start()].count('\n') + 1
+                        
+                        # Get the line content for context
+                        line_content = lines[line_num - 1].strip() if line_num <= len(lines) else ""
+                        
+                        # Extract default value if present
+                        default_value = _extract_default_value(line_content, var_name)
+                        
+                        if var_name not in env_vars:
+                            env_vars[var_name] = {
+                                'locations': [],
+                                'default': default_value,
+                                'description': _infer_description(var_name, line_content)
+                            }
+                        
+                        env_vars[var_name]['locations'].append({
+                            'file': relative_path,
+                            'line': line_num,
+                            'context': line_content
+                        })
+
+            except (IOError, UnicodeDecodeError) as e:
+                logging.warning(f"Failed to read file {file_path}: {e}")
+                continue
+
+    return env_vars
+
+
+def _extract_default_value(line_content, var_name):
+    """Extract default value from environment variable access."""
+    # Pattern: os.getenv('VAR', 'default') or os.environ.get('VAR', 'default')
+    patterns = [
+        re.compile(rf'(?:os\.getenv|os\.environ\.get|environ\.get)\(["\']' + 
+                   re.escape(var_name) + r'["\'],\s*["\']([^"\']*)["\']'),
+        re.compile(rf'(?:os\.getenv|os\.environ\.get|environ\.get)\(["\']' + 
+                   re.escape(var_name) + r'["\'],\s*([^,\)]+)\)'),
+    ]
+    
+    for pattern in patterns:
+        match = pattern.search(line_content)
+        if match:
+            return match.group(1).strip()
+    
+    return None
+
+
+def _infer_description(var_name, line_content):
+    """Infer a description for the environment variable based on its name and context."""
+    # Common patterns
+    descriptions = {
+        'API_KEY': 'API authentication key',
+        'SECRET_KEY': 'Secret key for encryption/signing',
+        'DATABASE_URL': 'Database connection URL',
+        'DB_HOST': 'Database host address',
+        'DB_PORT': 'Database port number',
+        'DB_NAME': 'Database name',
+        'DB_USER': 'Database username',
+        'DB_PASSWORD': 'Database password',
+        'REDIS_URL': 'Redis connection URL',
+        'DEBUG': 'Debug mode flag (True/False)',
+        'PORT': 'Application port number',
+        'HOST': 'Application host address',
+        'LOG_LEVEL': 'Logging level (DEBUG, INFO, WARNING, ERROR)',
+        'ENVIRONMENT': 'Environment name (development, staging, production)',
+        'AWS_ACCESS_KEY_ID': 'AWS access key ID',
+        'AWS_SECRET_ACCESS_KEY': 'AWS secret access key',
+        'AWS_REGION': 'AWS region',
+        'SMTP_HOST': 'SMTP server host',
+        'SMTP_PORT': 'SMTP server port',
+        'EMAIL_FROM': 'Email sender address',
+    }
+    
+    # Check for exact matches
+    if var_name in descriptions:
+        return descriptions[var_name]
+    
+    # Check for partial matches
+    for key, desc in descriptions.items():
+        if key in var_name:
+            return desc
+    
+    # Generate generic description based on name
+    words = var_name.lower().split('_')
+    return f"{' '.join(words).title()} configuration"
+
+
+def generate_env_files(env_vars, path, force=False):
+    """Generate .env and .env.sample files from discovered environment variables.
+    
+    Merges with existing files if they exist, avoiding duplicates.
+
+    Args:
+        env_vars (dict): Dictionary of environment variables and their metadata.
+        path (str): Directory path where .env files should be created.
+        force (bool): Whether to merge with existing files (True) or skip if exists (False).
+
+    Returns:
+        tuple: (env_file_path, env_sample_path)
+    """
+    env_file_path = os.path.join(path, '.env')
+    env_sample_path = os.path.join(path, '.env.sample')
+    
+    # Also check for .env.example as an alternative to .env.sample
+    env_example_path = os.path.join(path, '.env.example')
+    use_example = False
+    
+    if os.path.exists(env_example_path) and not os.path.exists(env_sample_path):
+        env_sample_path = env_example_path
+        use_example = True
+
+    # Parse existing .env files to get existing variables
+    existing_env_vars = _parse_existing_env_file(env_file_path) if os.path.exists(env_file_path) else {}
+    existing_sample_vars = _parse_existing_env_file(env_sample_path) if os.path.exists(env_sample_path) else {}
+    
+    # Check if files exist and force is not set
+    if not force:
+        if os.path.exists(env_file_path):
+            logging.warning(
+                f".env already exists at {env_file_path}. "
+                f"Use --force to merge with existing file."
+            )
+            env_file_path = None
+        if os.path.exists(env_sample_path):
+            logging.warning(
+                f"{os.path.basename(env_sample_path)} already exists at {env_sample_path}. "
+                f"Use --force to merge with existing file."
+            )
+            env_sample_path = None
+        
+        if not env_file_path and not env_sample_path:
+            return None, None
+
+    # Merge discovered vars with existing vars (existing takes precedence for values)
+    all_env_vars = {}
+    all_sample_vars = {}
+    
+    # Add existing variables first (to preserve their values)
+    for var_name, value in existing_env_vars.items():
+        if var_name in env_vars:
+            # Use existing value but update metadata
+            all_env_vars[var_name] = {
+                'value': value,
+                'metadata': env_vars[var_name]
+            }
+        else:
+            # Keep existing variable even if not detected in code
+            all_env_vars[var_name] = {
+                'value': value,
+                'metadata': {
+                    'description': 'Existing variable',
+                    'default': None,
+                    'locations': []
+                }
+            }
+    
+    # Add new discovered variables
+    for var_name, metadata in env_vars.items():
+        if var_name not in all_env_vars:
+            default = metadata.get('default')
+            all_env_vars[var_name] = {
+                'value': default if default else '',
+                'metadata': metadata
+            }
+    
+    # Same for sample file
+    for var_name, value in existing_sample_vars.items():
+        if var_name in env_vars:
+            all_sample_vars[var_name] = {
+                'value': value,
+                'metadata': env_vars[var_name]
+            }
+        else:
+            all_sample_vars[var_name] = {
+                'value': value,
+                'metadata': {
+                    'description': 'Existing variable',
+                    'default': None,
+                    'locations': []
+                }
+            }
+    
+    for var_name, metadata in env_vars.items():
+        if var_name not in all_sample_vars:
+            default = metadata.get('default')
+            all_sample_vars[var_name] = {
+                'value': default if default else '',
+                'metadata': metadata
+            }
+    
+    # Sort variables alphabetically
+    sorted_env_vars = sorted(all_env_vars.items())
+    sorted_sample_vars = sorted(all_sample_vars.items())
+    
+    # Count new vs existing
+    new_count = len([v for v in env_vars.keys() if v not in existing_env_vars])
+    existing_count = len(existing_env_vars)
+
+    # Generate .env file content
+    env_content = []
+    env_content.append("# Environment Variables")
+    env_content.append("# Generated by mod2pip --generate-env")
+    if existing_count > 0:
+        env_content.append(f"# Merged with {existing_count} existing variable(s), added {new_count} new variable(s)")
+    env_content.append("# Copy this file to .env and fill in your actual values")
+    env_content.append("")
+
+    for var_name, var_data in sorted_env_vars:
+        metadata = var_data['metadata']
+        value = var_data['value']
+        description = metadata.get('description', '')
+        locations = metadata.get('locations', [])
+
+        # Add comment with description
+        env_content.append(f"# {description}")
+
+        # Add comment with file locations
+        if locations:
+            location_str = ", ".join([f"{loc['file']}:{loc['line']}" for loc in locations[:3]])
+            if len(locations) > 3:
+                location_str += f" (+{len(locations) - 3} more)"
+            env_content.append(f"# Used in: {location_str}")
+
+        # Add the variable with its value
+        env_content.append(f"{var_name}={value}")
+        env_content.append("")
+
+    # Generate .env.sample/.env.example file content
+    sample_content = []
+    sample_content.append("# Environment Variables Template")
+    sample_content.append("# Generated by mod2pip --generate-env")
+    if len(existing_sample_vars) > 0:
+        sample_new_count = len([v for v in env_vars.keys() if v not in existing_sample_vars])
+        sample_content.append(f"# Merged with {len(existing_sample_vars)} existing variable(s), added {sample_new_count} new variable(s)")
+    sample_content.append("# Copy this file to .env and fill in your actual values")
+    sample_content.append("")
+
+    for var_name, var_data in sorted_sample_vars:
+        metadata = var_data['metadata']
+        value = var_data['value']
+        description = metadata.get('description', '')
+        locations = metadata.get('locations', [])
+
+        # Add comment with description
+        sample_content.append(f"# {description}")
+
+        # Add comment with file locations
+        if locations:
+            location_str = ", ".join([f"{loc['file']}:{loc['line']}" for loc in locations[:3]])
+            if len(locations) > 3:
+                location_str += f" (+{len(locations) - 3} more)"
+            sample_content.append(f"# Used in: {location_str}")
+
+        # Add the variable with its value
+        sample_content.append(f"{var_name}={value}")
+        sample_content.append("")
+
+    # Write .env file
+    if env_file_path:
+        try:
+            with open(env_file_path, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(env_content))
+            if existing_count > 0:
+                logging.info(f"Successfully merged {new_count} new variable(s) with {existing_count} existing in {env_file_path}")
+            else:
+                logging.info(f"Successfully created {env_file_path}")
+        except IOError as e:
+            logging.error(f"Failed to write {env_file_path}: {e}")
+            env_file_path = None
+
+    # Write .env.sample or .env.example file
+    if env_sample_path:
+        try:
+            with open(env_sample_path, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(sample_content))
+            sample_new_count = len([v for v in env_vars.keys() if v not in existing_sample_vars])
+            if len(existing_sample_vars) > 0:
+                logging.info(f"Successfully merged {sample_new_count} new variable(s) with {len(existing_sample_vars)} existing in {env_sample_path}")
+            else:
+                logging.info(f"Successfully created {env_sample_path}")
+        except IOError as e:
+            logging.error(f"Failed to write {env_sample_path}: {e}")
+            env_sample_path = None
+
+    return env_file_path, env_sample_path
+
+
+def _parse_existing_env_file(file_path):
+    """Parse an existing .env file and return a dict of variables.
+    
+    Args:
+        file_path (str): Path to the .env file.
+        
+    Returns:
+        dict: Dictionary of variable names to values.
+    """
+    env_vars = {}
+    
+    if not os.path.exists(file_path):
+        return env_vars
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                
+                # Skip comments and empty lines
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Parse KEY=VALUE format
+                if '=' in line:
+                    # Split only on first = to handle values with =
+                    key, _, value = line.partition('=')
+                    key = key.strip()
+                    value = value.strip()
+                    
+                    # Remove quotes if present
+                    if value and value[0] in ('"', "'") and value[-1] == value[0]:
+                        value = value[1:-1]
+                    
+                    if key:
+                        env_vars[key] = value
+    
+    except (IOError, UnicodeDecodeError) as e:
+        logging.warning(f"Failed to parse existing env file {file_path}: {e}")
+    
+    return env_vars
+
+
 def get_name_without_alias(name):
     if "import " in name:
         match = REGEXP[0].match(name.strip())
@@ -1186,6 +1575,7 @@ def init(args):
     transitive_depth = int(args.get("--transitive-depth") or 2)
     enhanced_detection = args.get("--enhanced-detection", False)
     lib_names = args.get("--lib")
+    generate_env = args.get("--generate-env", False)
 
     scan_noteboooks = args.get("--scan-notebooks", False)
     handle_scan_noteboooks()
@@ -1199,6 +1589,40 @@ def init(args):
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(",")
+
+    # Handle --generate-env flag for creating .env files
+    if generate_env:
+        logging.info(f"Scanning for environment variables in {input_path}")
+        
+        env_vars = scan_for_env_variables(
+            input_path,
+            encoding=encoding,
+            extra_ignore_dirs=extra_ignore_dirs,
+            follow_links=follow_links
+        )
+        
+        if not env_vars:
+            logging.info("No environment variables found in Python files.")
+            return
+        
+        logging.info(f"Found {len(env_vars)} environment variables")
+        
+        # Display found variables
+        for var_name, metadata in sorted(env_vars.items()):
+            locations = metadata.get('locations', [])
+            logging.info(f"  {var_name}: found in {len(locations)} location(s)")
+        
+        # Generate .env files
+        env_file, sample_file = generate_env_files(
+            env_vars,
+            input_path,
+            force=args.get("--force", False)
+        )
+        
+        if env_file or sample_file:
+            logging.info("Environment files generated successfully!")
+        
+        return
 
     path = (
         args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
