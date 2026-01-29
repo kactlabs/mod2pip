@@ -9,11 +9,16 @@ exclude =
     .tox,
     .venv,
     venv,
-    env
+    env,
+    tests/_data*,
+    tests/_invalid_data,
+    docs/conf.py,
+    ci_debug.py
 ignore = 
     E501,
     W503,
     W504,
     W293,
     W291,
-    E129
+    E129,
+    F541

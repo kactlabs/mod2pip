@@ -23,17 +23,17 @@ def check_dependencies():
     """Check if required dependencies are installed."""
     missing = []
     try:
-        import docopt
+        import docopt  # noqa: F401
     except ImportError:
         missing.append('docopt')
     
     try:
-        import yarg
+        import yarg  # noqa: F401
     except ImportError:
         missing.append('yarg')
     
     try:
-        import requests
+        import requests  # noqa: F401
     except ImportError:
         missing.append('requests')
     

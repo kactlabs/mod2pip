@@ -48,6 +48,7 @@ try:
 except ImportError:
     tf = None
 
+
 # Late import in function
 def process_data():
     """Function with late import."""
@@ -56,6 +57,7 @@ def process_data():
         return stats.norm()
     except ImportError:
         return None
+
 
 # __import__ usage
 json_module = __import__('json')
@@ -66,6 +68,7 @@ try:
     plt = __import__(module_name + ".pyplot", fromlist=[''])
 except ImportError:
     plt = None
+
 
 # ============================================================================
 # SECTION 3: Environment Variables (for testing --generate-env)
@@ -114,10 +117,12 @@ FEATURE_FLAG = os.getenv('FEATURE_FLAG', 'enabled')
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def hello():
     """Simple hello world endpoint."""
     return f"Hello World! Environment: {ENVIRONMENT}"
+
 
 @app.route('/config')
 def show_config():
@@ -134,9 +139,11 @@ def show_config():
     }
     return config
 
+
 # ============================================================================
 # SECTION 5: Main Function
 # ============================================================================
+
 
 def main():
     """Demo function showing environment variable usage."""
@@ -155,16 +162,16 @@ def main():
     print("\nImported modules:")
     try:
         print(f"  - requests: {requests.__version__}")
-    except:
-        print(f"  - requests: installed")
+    except Exception:
+        print("  - requests: installed")
     try:
         print(f"  - numpy: {np.__version__}")
-    except:
-        print(f"  - numpy: installed")
+    except Exception:
+        print("  - numpy: installed")
     try:
         print(f"  - flask: {Flask.__version__ if hasattr(Flask, '__version__') else 'installed'}")
-    except:
-        print(f"  - flask: installed")
+    except Exception:
+        print("  - flask: installed")
     print(f"  - pandas: {'loaded' if pandas_module else 'not installed'}")
     print(f"  - tensorflow: {'loaded' if tf else 'not installed'}")
     print(f"  - matplotlib: {'loaded' if plt else 'not installed'}")

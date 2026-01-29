@@ -68,6 +68,7 @@ Options:
     --scan-notebooks      Look for imports in jupyter notebook files.
     --lib <packages>...   Add specific libraries with their installed versions (comma-separated)
     --generate-env        Scan Python files for environment variables and generate .env and .env.sample files
+    --validate-env        Validate .env file values against known patterns (API keys, tokens, URLs, etc.)
 ```
 
 ## Examples
@@ -181,6 +182,54 @@ SECRET_KEY=dev-secret-key
 ```
 
 For more examples, see the `demo_project.py` file.
+
+### Validate Environment Variable Values (New in v0.11.0)
+
+Validate your `.env` file to ensure API keys, tokens, and other sensitive values match expected patterns:
+
+    $ mod2pip --validate-env
+    INFO: Validating /home/project/.env...
+    ✓ All 15 environment variable(s) validated successfully!
+
+If validation issues are found:
+
+    $ mod2pip --validate-env
+    INFO: Validating /home/project/.env...
+    ERROR: ✗ Found 2 validation issue(s):
+    
+      Variable: SLACK_BOT_TOKEN
+      Current value: abc123...
+      Expected: Slack Bot Token (starts with xoxb-)
+      Example: xoxb-YOUR-BOT-TOKEN-HERE
+    
+      Variable: OPENAI_API_KEY
+      Current value: test-key...
+      Expected: OpenAI API Key (starts with sk-)
+      Example: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+**Supported Patterns:**
+- **AI/ML Services**: OpenAI, Gemini, DeepSeek, Anthropic, Groq, Cohere, Hugging Face, Replicate, Stability AI, ElevenLabs, AssemblyAI, LangChain
+- **Vector Databases**: Pinecone, Weaviate
+- **Communication**: Slack, Discord, Telegram, Zoom
+- **Cloud Platforms**: AWS, Azure, Google Cloud Platform
+- **Hosting/Deployment**: Netlify, Vercel, Heroku, Railway, Render, Fly.io, DigitalOcean, Cloudflare
+- **Databases**: MongoDB, PostgreSQL, Redis, Supabase, PlanetScale, CockroachDB, Neon, Upstash, MongoDB Atlas
+- **CMS/Content**: Contentful, Sanity, Airtable, Notion
+- **Version Control**: GitHub, GitLab, Bitbucket
+- **Payment Processing**: Stripe, PayPal, Square
+- **Email Services**: SendGrid, Mailgun, Twilio
+- **CRM/Support**: HubSpot, Intercom, Zendesk, Freshdesk, Salesforce
+- **Analytics**: Amplitude, Mixpanel, Segment, LogRocket, Datadog
+- **Error Tracking**: Sentry, Bugsnag, Rollbar, New Relic
+- **Search/Logging**: Algolia, Elasticsearch
+- **Maps**: Mapbox, Google Maps
+- **Real-time**: Pusher
+- **Project Management**: Linear, Asana, Jira
+- **Other**: Firebase, JWT secrets, and more
+
+**Total: 100+ validation patterns** covering the most popular services and APIs.
+
+Patterns are defined in `mod2pip/env_patterns.json` and can be customized.
 
 ## Why not pip freeze?
 
