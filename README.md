@@ -4,10 +4,21 @@
 [![PyPI version](https://img.shields.io/pypi/v/mod2pip.svg)](https://pypi.python.org/pypi/mod2pip)
 [![codecov](https://codecov.io/gh/kactlabs/mod2pip/branch/master/graph/badge.svg?token=0rfPfUZEAX)](https://codecov.io/gh/kactlabs/mod2pip)
 [![License](https://img.shields.io/pypi/l/mod2pip.svg)](https://pypi.python.org/pypi/mod2pip)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
-## About This Fork
+**A superior alternative to pipreqs** - Actively maintained with comprehensive features for modern Python development.
 
-This repository is forked from [mod2pip - https://github.com/kactlabs/mod2pip](https://github.com/kactlabs/mod2pip) with additional bugfixes and improvements.
+## About This Project
+
+mod2pip is an enhanced requirements.txt generator that addresses all major limitations of pipreqs:
+- ✅ Detects dynamic imports (`__import__`, `importlib`)
+- ✅ Supports conda environments
+- ✅ Handles Python 3.9-3.13 (including latest 3.13)
+- ✅ Graceful syntax error handling (works with legacy Python 2 code)
+- ✅ 1,785 standard library modules filtered
+- ✅ 1,156 import-to-package mappings
+- ✅ Environment file generation and validation
+- ✅ Active maintenance with regular updates
 
 ## Installation
 
@@ -233,7 +244,7 @@ Patterns are defined in `mod2pip/env_patterns.json` and can be customized.
 
 ## Why mod2pip over pipreqs?
 
-mod2pip addresses common limitations found in pipreqs:
+mod2pip addresses common limitations found in pipreqs and is actively maintained with regular updates.
 
 ### 1. **Dynamic Import Detection**
 Unlike pipreqs which only uses static analysis, mod2pip detects:
@@ -290,6 +301,52 @@ mod2pip ensures accurate package naming:
 - **Symbolic link support**: `--no-follow-links` flag to control symlink behavior
 - **Nested project structures**: Handles deeply nested folders and unusual naming
 - **Graceful error handling**: Continues processing even if individual files fail
+
+### 8. **Superior Module-to-Package Resolution**
+mod2pip has the most comprehensive mapping system:
+- **1,785 standard library modules**: Filters out stdlib to prevent false positives (e.g., `json`, `os`, `sys`)
+- **1,156 import-to-package mappings**: Handles special cases correctly:
+  - `PIL` → `Pillow`
+  - `cv2` → `opencv-python`
+  - `sklearn` → `scikit-learn`
+  - `MySQLdb` → `MySQL-python`
+  - And 1,152+ more mappings
+- **Local-first resolution**: Checks installed packages before querying PyPI
+- **Clear warnings**: Alerts when remote resolution is used, prompting manual verification
+
+### 9. **Robust Syntax and Compatibility**
+- **Graceful syntax error handling**: Falls back to regex parsing when AST parsing fails
+- **Legacy Python 2 support**: Can parse old codebases without crashing
+- **Python 3.9-3.13 support**: Fully tested across all modern Python versions
+- **Continues on errors**: Processes remaining files even if some fail
+
+### 10. **Active Maintenance**
+Unlike pipreqs which has many unresolved issues, mod2pip is actively maintained with:
+- Regular bug fixes and feature updates
+- Comprehensive test suite with CI/CD
+- Support for latest Python versions (3.9-3.13)
+- Responsive issue resolution
+- Modern development practices (flake8, type hints, documentation)
+
+## Comparison: mod2pip vs pipreqs vs pip freeze
+
+| Feature | mod2pip | pipreqs | pip freeze |
+|---------|---------|---------|------------|
+| Dynamic imports | ✅ Yes | ❌ No | ❌ No |
+| Conda support | ✅ Yes | ❌ No | ⚠️ Partial |
+| Transitive dependencies | ✅ Optional | ❌ No | ✅ Yes |
+| Standard library filtering | ✅ 1,785 modules | ✅ Basic | ❌ No |
+| Package name mapping | ✅ 1,156 mappings | ⚠️ Limited | ✅ Correct |
+| Syntax error handling | ✅ Graceful fallback | ❌ Crashes | N/A |
+| Python 3.13 support | ✅ Yes | ❌ No | ✅ Yes |
+| Symbolic link control | ✅ Yes | ❌ No | N/A |
+| Auto directory creation | ✅ Yes | ❌ No | N/A |
+| Environment file generation | ✅ Yes | ❌ No | ❌ No |
+| Environment validation | ✅ Yes (100+ patterns) | ❌ No | ❌ No |
+| Selective library addition | ✅ Yes (`--lib`) | ❌ No | ❌ No |
+| Smart merging/appending | ✅ Yes | ❌ No | ❌ No |
+| Active maintenance | ✅ Yes | ⚠️ Limited | ✅ Yes |
+| Only project dependencies | ✅ Yes | ✅ Yes | ❌ No |
 
 ## Why not pip freeze?
 

@@ -56,6 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaner, more maintainable codebase
 - More robust file handling with automatic directory creation
 - Enhanced error handling for file operations
+- **Comprehensive standard library filtering**: 1,785 stdlib modules to prevent false positives
+- **Extensive package mapping**: 1,156 import-to-package mappings for accurate resolution
+- **Graceful syntax error handling**: Falls back to regex parsing when AST parsing fails (supports legacy Python 2 code)
+- **Python 3.13 support**: Fully tested and compatible with Python 3.9-3.13
 
 ### Documentation
 - Updated `README.md` with `--validate-env` examples and comprehensive list of 100+ supported patterns
