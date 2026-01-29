@@ -46,6 +46,7 @@ Options:
                           versions (comma-separated).
     --generate-env        Scan Python files for environment variables and
                           generate .env and .env.sample files.
+    --validate-env        Validate .env file values against known patterns.
 """
 from contextlib import contextmanager
 import os
@@ -1184,11 +1185,9 @@ def generate_env_files(env_vars, path, force=False):
     
     # Also check for .env.example as an alternative to .env.sample
     env_example_path = os.path.join(path, '.env.example')
-    use_example = False
     
     if os.path.exists(env_example_path) and not os.path.exists(env_sample_path):
         env_sample_path = env_example_path
-        use_example = True
 
     # Parse existing .env files to get existing variables
     existing_env_vars = _parse_existing_env_file(env_file_path) if os.path.exists(env_file_path) else {}
@@ -1409,6 +1408,121 @@ def _parse_existing_env_file(file_path):
     return env_vars
 
 
+def _load_env_patterns():
+    """Load environment variable patterns from JSON file.
+    
+    Returns:
+        dict: Dictionary of patterns or empty dict if file not found.
+    """
+    patterns_file = join("env_patterns.json")
+    
+    try:
+        with open(patterns_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data.get('patterns', {})
+    except (IOError, json.JSONDecodeError) as e:
+        logging.debug(f"Could not load env patterns: {e}")
+        return {}
+
+
+def validate_env_values(env_vars, path):
+    """Validate environment variable values against known patterns.
+    
+    Args:
+        env_vars (dict): Dictionary of variable names to values.
+        path (str): Path to the .env file being validated.
+        
+    Returns:
+        list: List of validation issues found.
+    """
+    patterns = _load_env_patterns()
+    issues = []
+    
+    if not patterns:
+        logging.debug("No validation patterns loaded")
+        return issues
+    
+    for var_name, value in env_vars.items():
+        # Skip empty values
+        if not value:
+            continue
+        
+        # Check if variable name matches any pattern
+        pattern_info = None
+        
+        # Exact match
+        if var_name in patterns:
+            pattern_info = patterns[var_name]
+        else:
+            # Partial match (e.g., SLACK_TOKEN matches SLACK_BOT_TOKEN pattern)
+            for pattern_key in patterns.keys():
+                if pattern_key in var_name or var_name in pattern_key:
+                    pattern_info = patterns[pattern_key]
+                    break
+        
+        if pattern_info:
+            pattern = pattern_info['pattern']
+            description = pattern_info.get('description', '')
+            example = pattern_info.get('example', '')
+            
+            # Validate value against pattern
+            if not re.match(pattern, value):
+                issues.append({
+                    'variable': var_name,
+                    'value': value[:20] + '...' if len(value) > 20 else value,
+                    'expected': description,
+                    'example': example,
+                    'pattern': pattern
+                })
+    
+    return issues
+
+
+def validate_env_file(path):
+    """Validate a .env file and report any issues.
+    
+    Args:
+        path (str): Path to the directory containing .env file.
+        
+    Returns:
+        bool: True if validation passed, False if issues found.
+    """
+    env_file_path = os.path.join(path, '.env')
+    
+    if not os.path.exists(env_file_path):
+        logging.info(f"No .env file found at {env_file_path}")
+        return True
+    
+    logging.info(f"Validating {env_file_path}...")
+    
+    # Parse the .env file
+    env_vars = _parse_existing_env_file(env_file_path)
+    
+    if not env_vars:
+        logging.info("No environment variables found in .env file")
+        return True
+    
+    # Validate values
+    issues = validate_env_values(env_vars, path)
+    
+    if not issues:
+        logging.info(f"✓ All {len(env_vars)} environment variable(s) validated successfully!")
+        return True
+    
+    # Report issues as errors
+    logging.error(f"✗ Found {len(issues)} validation issue(s):")
+    for issue in issues:
+        logging.error(f"\n  Variable: {issue['variable']}")
+        logging.error(f"  Current value: {issue['value']}")
+        logging.error(f"  Expected: {issue['expected']}")
+        if issue['example']:
+            logging.error(f"  Example: {issue['example']}")
+    
+    return False
+    
+    return False
+
+
 def get_name_without_alias(name):
     if "import " in name:
         match = REGEXP[0].match(name.strip())
@@ -1576,6 +1690,7 @@ def init(args):
     enhanced_detection = args.get("--enhanced-detection", False)
     lib_names = args.get("--lib")
     generate_env = args.get("--generate-env", False)
+    validate_env_flag = args.get("--validate-env", False)
 
     scan_noteboooks = args.get("--scan-notebooks", False)
     handle_scan_noteboooks()
@@ -1589,6 +1704,11 @@ def init(args):
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(",")
+
+    # Handle --validate-env flag for validating .env files
+    if validate_env_flag:
+        validate_env_file(input_path)
+        return
 
     # Handle --generate-env flag for creating .env files
     if generate_env:

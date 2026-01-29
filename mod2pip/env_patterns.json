@@ -1,0 +1,489 @@
+{
+  "patterns": {
+    "SLACK_BOT_TOKEN": {
+      "pattern": "^xoxb-[0-9]+-[0-9]+-[a-zA-Z0-9]+$",
+      "description": "Slack Bot Token (starts with xoxb-)",
+      "example": "xoxb-YOUR-BOT-TOKEN-HERE"
+    },
+    "SLACK_TOKEN": {
+      "pattern": "^xox[bpoa]-[0-9]+-[0-9]+-[a-zA-Z0-9]+$",
+      "description": "Slack Token (starts with xoxb-, xoxp-, xoxo-, or xoxa-)",
+      "example": "xoxb-YOUR-TOKEN-HERE"
+    },
+    "SLACK_WEBHOOK_URL": {
+      "pattern": "^https://hooks\\.slack\\.com/services/T[A-Z0-9]+/B[A-Z0-9]+/[a-zA-Z0-9]+$",
+      "description": "Slack Webhook URL",
+      "example": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    },
+    "OPENAI_API_KEY": {
+      "pattern": "^sk-[a-zA-Z0-9]{48}$",
+      "description": "OpenAI API Key (starts with sk-)",
+      "example": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "GEMINI_API_KEY": {
+      "pattern": "^AIza[a-zA-Z0-9_-]{35}$",
+      "description": "Google Gemini API Key (starts with AIza)",
+      "example": "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    },
+    "DEEPSEEK_API_KEY": {
+      "pattern": "^sk-[a-zA-Z0-9]{48}$",
+      "description": "DeepSeek API Key (starts with sk-)",
+      "example": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ANTHROPIC_API_KEY": {
+      "pattern": "^sk-ant-[a-zA-Z0-9_-]{95,}$",
+      "description": "Anthropic API Key (starts with sk-ant-)",
+      "example": "sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "GROQ_API_KEY": {
+      "pattern": "^gsk_[a-zA-Z0-9]{52}$",
+      "description": "Groq API Key (starts with gsk_)",
+      "example": "gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "GITHUB_TOKEN": {
+      "pattern": "^(ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82})$",
+      "description": "GitHub Personal Access Token",
+      "example": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "pattern": "^AKIA[A-Z0-9]{16}$",
+      "description": "AWS Access Key ID (starts with AKIA)",
+      "example": "AKIAIOSFODNN7EXAMPLE"
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "pattern": "^[A-Za-z0-9/+=]{40}$",
+      "description": "AWS Secret Access Key (40 characters)",
+      "example": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    },
+    "STRIPE_API_KEY": {
+      "pattern": "^(sk|pk)_(test|live)_[a-zA-Z0-9]{24,}$",
+      "description": "Stripe API Key",
+      "example": "sk_test_xxxxxxxxxxxxxxxxxxxx"
+    },
+    "TWILIO_AUTH_TOKEN": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Twilio Auth Token (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "SENDGRID_API_KEY": {
+      "pattern": "^SG\\.[a-zA-Z0-9_-]{22}\\.[a-zA-Z0-9_-]{43}$",
+      "description": "SendGrid API Key (starts with SG.)",
+      "example": "SG.xxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "JWT_SECRET": {
+      "pattern": "^.{32,}$",
+      "description": "JWT Secret (minimum 32 characters)",
+      "example": "your-256-bit-secret-key-here-minimum-32-chars"
+    },
+    "DATABASE_URL": {
+      "pattern": "^(postgres|postgresql|mysql|mongodb|redis)://.*$",
+      "description": "Database URL with protocol",
+      "example": "postgresql://user:password@localhost:5432/dbname"
+    },
+    "REDIS_URL": {
+      "pattern": "^redis(s)?://.*$",
+      "description": "Redis URL (starts with redis:// or rediss://)",
+      "example": "redis://localhost:6379"
+    },
+    "MONGODB_URI": {
+      "pattern": "^mongodb(\\+srv)?://.*$",
+      "description": "MongoDB URI (starts with mongodb:// or mongodb+srv://)",
+      "example": "mongodb://localhost:27017/mydb"
+    },
+    "MAILGUN_API_KEY": {
+      "pattern": "^key-[a-f0-9]{32}$",
+      "description": "Mailgun API Key (starts with key-)",
+      "example": "key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "FIREBASE_API_KEY": {
+      "pattern": "^AIza[a-zA-Z0-9_-]{35}$",
+      "description": "Firebase API Key (starts with AIza)",
+      "example": "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    },
+    "HEROKU_API_KEY": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "Heroku API Key (UUID format)",
+      "example": "12345678-1234-1234-1234-123456789012"
+    },
+    "DIGITALOCEAN_TOKEN": {
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "DigitalOcean Personal Access Token (64 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "CLOUDFLARE_API_KEY": {
+      "pattern": "^[a-f0-9]{37}$",
+      "description": "Cloudflare API Key (37 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "CLOUDFLARE_API_TOKEN": {
+      "pattern": "^[a-zA-Z0-9_-]{40}$",
+      "description": "Cloudflare API Token (40 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "DATADOG_API_KEY": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Datadog API Key (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "DATADOG_APP_KEY": {
+      "pattern": "^[a-f0-9]{40}$",
+      "description": "Datadog Application Key (40 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "SENTRY_DSN": {
+      "pattern": "^https://[a-f0-9]{32}@[a-z0-9]+\\.ingest\\.sentry\\.io/[0-9]+$",
+      "description": "Sentry DSN URL",
+      "example": "https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@o123456.ingest.sentry.io/1234567"
+    },
+    "ALGOLIA_API_KEY": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Algolia API Key (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ALGOLIA_APP_ID": {
+      "pattern": "^[A-Z0-9]{10}$",
+      "description": "Algolia Application ID (10 uppercase alphanumeric)",
+      "example": "ABCD123456"
+    },
+    "PUSHER_APP_KEY": {
+      "pattern": "^[a-f0-9]{20}$",
+      "description": "Pusher App Key (20 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxx"
+    },
+    "PUSHER_SECRET": {
+      "pattern": "^[a-f0-9]{20}$",
+      "description": "Pusher Secret (20 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxx"
+    },
+    "MAPBOX_ACCESS_TOKEN": {
+      "pattern": "^pk\\.[a-zA-Z0-9_-]{60,}$",
+      "description": "Mapbox Access Token (starts with pk.)",
+      "example": "pk.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "GOOGLE_MAPS_API_KEY": {
+      "pattern": "^AIza[a-zA-Z0-9_-]{35}$",
+      "description": "Google Maps API Key (starts with AIza)",
+      "example": "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    },
+    "PAYPAL_CLIENT_ID": {
+      "pattern": "^A[a-zA-Z0-9_-]{79}$",
+      "description": "PayPal Client ID (starts with A, 80 characters)",
+      "example": "Axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "PAYPAL_SECRET": {
+      "pattern": "^E[a-zA-Z0-9_-]{79}$",
+      "description": "PayPal Secret (starts with E, 80 characters)",
+      "example": "Exxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "SQUARE_ACCESS_TOKEN": {
+      "pattern": "^sq0atp-[a-zA-Z0-9_-]{22}$",
+      "description": "Square Access Token (starts with sq0atp-)",
+      "example": "sq0atp-ExampleNotRealToken"
+    },
+    "SQUARE_APP_ID": {
+      "pattern": "^sq0idp-[a-zA-Z0-9_-]{22}$",
+      "description": "Square Application ID (starts with sq0idp-)",
+      "example": "sq0idp-xxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "DISCORD_BOT_TOKEN": {
+      "pattern": "^[A-Za-z0-9_-]{24}\\.[A-Za-z0-9_-]{6}\\.[A-Za-z0-9_-]{27}$",
+      "description": "Discord Bot Token (3 parts separated by dots)",
+      "example": "ExampleNotRealToken00000.Abc123.ExampleDiscordTokenNotReal00"
+    },
+    "TELEGRAM_BOT_TOKEN": {
+      "pattern": "^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$",
+      "description": "Telegram Bot Token (bot ID:token)",
+      "example": "123456789:ABCdefGHIjklMNOpqrsTUVwxyz-1234567890"
+    },
+    "AZURE_CLIENT_ID": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "Azure Client ID (UUID format)",
+      "example": "12345678-1234-1234-1234-123456789012"
+    },
+    "AZURE_CLIENT_SECRET": {
+      "pattern": "^[a-zA-Z0-9~._-]{34,40}$",
+      "description": "Azure Client Secret (34-40 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "AZURE_TENANT_ID": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "Azure Tenant ID (UUID format)",
+      "example": "12345678-1234-1234-1234-123456789012"
+    },
+    "GCP_PROJECT_ID": {
+      "pattern": "^[a-z][a-z0-9-]{4,28}[a-z0-9]$",
+      "description": "Google Cloud Project ID (6-30 lowercase alphanumeric with hyphens)",
+      "example": "my-project-123456"
+    },
+    "GCP_SERVICE_ACCOUNT_KEY": {
+      "pattern": "^\\{.*\"type\":\\s*\"service_account\".*\\}$",
+      "description": "Google Cloud Service Account Key (JSON format)",
+      "example": "{\"type\": \"service_account\", \"project_id\": \"...\"}"
+    },
+    "NETLIFY_AUTH_TOKEN": {
+      "pattern": "^[a-zA-Z0-9_-]{43}$",
+      "description": "Netlify Personal Access Token (43 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "VERCEL_TOKEN": {
+      "pattern": "^[a-zA-Z0-9]{24}$",
+      "description": "Vercel Access Token (24 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "SUPABASE_URL": {
+      "pattern": "^https://[a-z]{20}\\.supabase\\.co$",
+      "description": "Supabase Project URL",
+      "example": "https://abcdefghijklmnopqrst.supabase.co"
+    },
+    "SUPABASE_ANON_KEY": {
+      "pattern": "^eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$",
+      "description": "Supabase Anonymous Key (JWT format)",
+      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI..."
+    },
+    "SUPABASE_SERVICE_KEY": {
+      "pattern": "^eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$",
+      "description": "Supabase Service Role Key (JWT format)",
+      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI..."
+    },
+    "PLANETSCALE_TOKEN": {
+      "pattern": "^pscale_tkn_[a-zA-Z0-9_-]{43}$",
+      "description": "PlanetScale Service Token (starts with pscale_tkn_)",
+      "example": "pscale_tkn_YOUR_TOKEN_HERE"
+    },
+    "RAILWAY_TOKEN": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "Railway API Token (UUID format)",
+      "example": "12345678-1234-1234-1234-123456789012"
+    },
+    "RENDER_API_KEY": {
+      "pattern": "^rnd_[a-zA-Z0-9]{40}$",
+      "description": "Render API Key (starts with rnd_)",
+      "example": "rnd_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "FLY_API_TOKEN": {
+      "pattern": "^fo1_[a-zA-Z0-9]{40}$",
+      "description": "Fly.io API Token (starts with fo1_)",
+      "example": "fo1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "CONTENTFUL_ACCESS_TOKEN": {
+      "pattern": "^[a-zA-Z0-9_-]{43}$",
+      "description": "Contentful Content Delivery API Token (43 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "CONTENTFUL_MANAGEMENT_TOKEN": {
+      "pattern": "^CFPAT-[a-zA-Z0-9_-]{43}$",
+      "description": "Contentful Management API Token (starts with CFPAT-)",
+      "example": "CFPAT-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "SANITY_TOKEN": {
+      "pattern": "^sk[a-zA-Z0-9]{40}$",
+      "description": "Sanity API Token (starts with sk)",
+      "example": "skxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "AIRTABLE_API_KEY": {
+      "pattern": "^key[a-zA-Z0-9]{14}$",
+      "description": "Airtable API Key (starts with key)",
+      "example": "keyxxxxxxxxxxxxxx"
+    },
+    "NOTION_API_KEY": {
+      "pattern": "^secret_[a-zA-Z0-9]{43}$",
+      "description": "Notion Integration Token (starts with secret_)",
+      "example": "secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "LINEAR_API_KEY": {
+      "pattern": "^lin_api_[a-zA-Z0-9]{40}$",
+      "description": "Linear API Key (starts with lin_api_)",
+      "example": "lin_api_YOUR_KEY_HERE"
+    },
+    "ASANA_ACCESS_TOKEN": {
+      "pattern": "^[0-9]/[0-9]{16}/[a-f0-9]{32}$",
+      "description": "Asana Personal Access Token",
+      "example": "1/1234567890123456/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "JIRA_API_TOKEN": {
+      "pattern": "^[a-zA-Z0-9]{24}$",
+      "description": "Jira API Token (24 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "GITLAB_TOKEN": {
+      "pattern": "^(glpat-|glptt-|gldt-)[a-zA-Z0-9_-]{20}$",
+      "description": "GitLab Personal/Project/Deploy Token",
+      "example": "glpat-xxxxxxxxxxxxxxxxxxxx"
+    },
+    "BITBUCKET_APP_PASSWORD": {
+      "pattern": "^[a-zA-Z0-9]{16}$",
+      "description": "Bitbucket App Password (16 characters)",
+      "example": "xxxxxxxxxxxxxxxx"
+    },
+    "HUBSPOT_API_KEY": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "HubSpot API Key (UUID format)",
+      "example": "12345678-1234-1234-1234-123456789012"
+    },
+    "INTERCOM_ACCESS_TOKEN": {
+      "pattern": "^dG9rOj[a-zA-Z0-9_-]{59}$",
+      "description": "Intercom Access Token (starts with dG9rOj)",
+      "example": "dG9rOjxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ZENDESK_API_TOKEN": {
+      "pattern": "^[a-zA-Z0-9]{40}$",
+      "description": "Zendesk API Token (40 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "FRESHDESK_API_KEY": {
+      "pattern": "^[a-zA-Z0-9]{20}$",
+      "description": "Freshdesk API Key (20 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxx"
+    },
+    "SALESFORCE_ACCESS_TOKEN": {
+      "pattern": "^00D[a-zA-Z0-9]{12}![a-zA-Z0-9._]{95,}$",
+      "description": "Salesforce Access Token (starts with 00D)",
+      "example": "00Dxx0000000000!ARxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ZOOM_JWT_TOKEN": {
+      "pattern": "^eyJ[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$",
+      "description": "Zoom JWT Token",
+      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ6b29tIi..."
+    },
+    "ZOOM_API_KEY": {
+      "pattern": "^[a-zA-Z0-9_-]{22}$",
+      "description": "Zoom API Key (22 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ZOOM_API_SECRET": {
+      "pattern": "^[a-zA-Z0-9_-]{22}$",
+      "description": "Zoom API Secret (22 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "AMPLITUDE_API_KEY": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Amplitude API Key (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "MIXPANEL_TOKEN": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Mixpanel Project Token (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "SEGMENT_WRITE_KEY": {
+      "pattern": "^[a-zA-Z0-9]{32}$",
+      "description": "Segment Write Key (32 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "LOGROCKET_APP_ID": {
+      "pattern": "^[a-z0-9]{5,}/[a-z0-9-]{3,}$",
+      "description": "LogRocket App ID (org/app format)",
+      "example": "myorg/my-app"
+    },
+    "BUGSNAG_API_KEY": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Bugsnag API Key (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ROLLBAR_ACCESS_TOKEN": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "Rollbar Access Token (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "NEW_RELIC_LICENSE_KEY": {
+      "pattern": "^[a-f0-9]{40}$",
+      "description": "New Relic License Key (40 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "NEW_RELIC_API_KEY": {
+      "pattern": "^NRAK-[a-zA-Z0-9]{27}$",
+      "description": "New Relic API Key (starts with NRAK-)",
+      "example": "NRAK-xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ELASTIC_CLOUD_ID": {
+      "pattern": "^[a-zA-Z0-9-]+:[a-zA-Z0-9+/=]+$",
+      "description": "Elastic Cloud ID (name:base64)",
+      "example": "my-deployment:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyQ..."
+    },
+    "ELASTIC_API_KEY": {
+      "pattern": "^[a-zA-Z0-9_-]{20,}$",
+      "description": "Elasticsearch API Key (20+ characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxx"
+    },
+    "MONGODB_ATLAS_PUBLIC_KEY": {
+      "pattern": "^[a-z]{8}$",
+      "description": "MongoDB Atlas Public Key (8 lowercase letters)",
+      "example": "abcdefgh"
+    },
+    "MONGODB_ATLAS_PRIVATE_KEY": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "MongoDB Atlas Private Key (UUID format)",
+      "example": "12345678-1234-1234-123456789012"
+    },
+    "COCKROACHDB_URL": {
+      "pattern": "^postgresql://.*\\.cockroachlabs\\.cloud:26257/.*$",
+      "description": "CockroachDB Connection URL",
+      "example": "postgresql://user:password@cluster.cockroachlabs.cloud:26257/defaultdb"
+    },
+    "NEON_DATABASE_URL": {
+      "pattern": "^postgresql://.*\\.neon\\.tech/.*$",
+      "description": "Neon Database URL",
+      "example": "postgresql://user:password@ep-xxx.neon.tech/dbname"
+    },
+    "UPSTASH_REDIS_URL": {
+      "pattern": "^https://.*\\.upstash\\.io$",
+      "description": "Upstash Redis REST URL",
+      "example": "https://us1-xxx.upstash.io"
+    },
+    "UPSTASH_REDIS_TOKEN": {
+      "pattern": "^[a-zA-Z0-9_-]{32,}$",
+      "description": "Upstash Redis REST Token (32+ characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "PINECONE_API_KEY": {
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "description": "Pinecone API Key (UUID format)",
+      "example": "12345678-1234-1234-1234-123456789012"
+    },
+    "PINECONE_ENVIRONMENT": {
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Pinecone Environment (lowercase alphanumeric with hyphens)",
+      "example": "us-west1-gcp"
+    },
+    "COHERE_API_KEY": {
+      "pattern": "^[a-zA-Z0-9]{40}$",
+      "description": "Cohere API Key (40 characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "HUGGINGFACE_TOKEN": {
+      "pattern": "^hf_[a-zA-Z0-9]{38}$",
+      "description": "Hugging Face API Token (starts with hf_)",
+      "example": "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "REPLICATE_API_TOKEN": {
+      "pattern": "^r8_[a-zA-Z0-9]{40}$",
+      "description": "Replicate API Token (starts with r8_)",
+      "example": "r8_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "STABILITY_API_KEY": {
+      "pattern": "^sk-[a-zA-Z0-9]{48}$",
+      "description": "Stability AI API Key (starts with sk-)",
+      "example": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ELEVENLABS_API_KEY": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "ElevenLabs API Key (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "ASSEMBLYAI_API_KEY": {
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "AssemblyAI API Key (32 hex characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "LANGCHAIN_API_KEY": {
+      "pattern": "^ls__[a-f0-9]{32}$",
+      "description": "LangChain API Key (starts with ls__)",
+      "example": "ls__xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "WEAVIATE_API_KEY": {
+      "pattern": "^[a-zA-Z0-9_-]{32,}$",
+      "description": "Weaviate API Key (32+ characters)",
+      "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+  }
+}

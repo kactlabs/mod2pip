@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2025-01-29
+
+### Added
+- **New `--validate-env` flag**: Validate `.env` file values against known patterns
+  - Usage: `mod2pip --validate-env`
+  - Validates API keys, tokens, URLs, and other sensitive values
+  - **100+ validation patterns** for popular services including:
+    - AI/ML: OpenAI, Gemini, DeepSeek, Anthropic, Groq, Cohere, Hugging Face, Replicate, Stability AI, ElevenLabs, AssemblyAI, LangChain
+    - Vector Databases: Pinecone, Weaviate
+    - Communication: Slack, Discord, Telegram, Zoom
+    - Cloud: AWS, Azure, GCP, Netlify, Vercel, Heroku, Railway, Render, Fly.io
+    - Databases: MongoDB, PostgreSQL, Redis, Supabase, PlanetScale, CockroachDB, Neon, Upstash
+    - CMS: Contentful, Sanity, Airtable, Notion
+    - Version Control: GitHub, GitLab, Bitbucket
+    - Payments: Stripe, PayPal, Square
+    - Email: SendGrid, Mailgun, Twilio
+    - CRM: HubSpot, Intercom, Zendesk, Freshdesk, Salesforce
+    - Analytics: Amplitude, Mixpanel, Segment, LogRocket, Datadog
+    - Error Tracking: Sentry, Bugsnag, Rollbar, New Relic
+    - And many more...
+  - Reports validation issues with helpful examples
+  - Patterns defined in `mod2pip/env_patterns.json`
+  - Helps catch configuration errors before deployment
+  - Supports partial name matching (e.g., SLACK_TOKEN matches SLACK_BOT_TOKEN pattern)
+
+- New helper functions for validation:
+  - `_load_env_patterns()`: Loads validation patterns from JSON
+  - `validate_env_values()`: Validates env values against patterns
+  - `validate_env_file()`: Main validation function
+
+- New configuration file:
+  - `mod2pip/env_patterns.json`: 100+ pattern definitions for environment variable validation covering popular services (AI/ML, Cloud, Databases, CMS, Analytics, etc.)
+
+### Fixed
+- Resolved all flake8 linting issues for improved code quality
+  - Fixed unused variable warnings
+  - Fixed import statement formatting
+  - Fixed function spacing (E302, E305)
+  - Fixed bare except clauses (E722)
+  - Configured `.flake8` to ignore F541 (f-strings without placeholders)
+  - Excluded test data files and documentation from linting
+
+### Improved
+- Code quality improvements across all Python files
+- Better adherence to PEP 8 style guidelines
+- Cleaner, more maintainable codebase
+
+### Documentation
+- Updated `README.md` with `--validate-env` examples and comprehensive list of 100+ supported patterns
+- Updated `CHANGELOG.md` with v0.11.0 release notes
+
 ## [0.10.0] - 2025-01-29
 
 ### Added
@@ -23,12 +74,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Supports both `.env.sample` and `.env.example` formats
   - Respects `--ignore` directories and standard ignore patterns
   - Perfect for project documentation and onboarding new developers
+
 - New helper functions for environment variable detection:
   - `scan_for_env_variables()`: Main scanning function
   - `_extract_default_value()`: Extracts default values from code
   - `_infer_description()`: Generates descriptions for common env vars
   - `generate_env_files()`: Creates .env and .env.sample files with smart merging
   - `_parse_existing_env_file()`: Parses existing .env files for merging
+
+- New configuration file:
+  - `mod2pip/env_patterns.json`: Pattern definitions for environment variable validation
 
 ### Improved
 - Enhanced library name matching in `--lib` flag to handle more package name variations
@@ -181,6 +236,7 @@ mod2pip --append --lib flask,django --mode no-pin  # No version
 mod2pip --force --lib langchain --savepath my-requirements.txt
 ```
 
+[0.11.0]: https://github.com/kactlabs/mod2pip/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/kactlabs/mod2pip/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/kactlabs/mod2pip/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/kactlabs/mod2pip/compare/v0.6.0...v0.8.0
