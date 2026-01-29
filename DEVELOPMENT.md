@@ -30,6 +30,9 @@ flake8 mod2pip tests/test_mod2pip.py --max-line-length=100
 
 # Run debug script to check environment
 python ci_debug.py
+
+# Test all new features (v0.7.0)
+python test_mod2pip_features.py
 ```
 
 ### Code Quality
@@ -118,11 +121,41 @@ mod2pip/
 │   └── stdlib            # Standard library modules
 ├── tests/                # Test suite
 ├── docs/                 # Documentation
+├── test_mod2pip_features.py  # Comprehensive test suite for v0.7.0 features
+├── demo_project.py       # Demo file for testing all features
 ├── requirements-dev.txt  # Development dependencies
 ├── pyproject.toml        # Package configuration
 ├── tox.ini              # Tox configuration
 └── Makefile             # Development commands
 ```
+
+## New Features (v0.10.0)
+
+### --lib Flag
+Add specific libraries with their installed versions:
+```bash
+mod2pip --force --lib langchain,langchain-core
+```
+
+### --generate-env Flag
+Scan Python files for environment variables and generate .env files:
+```bash
+mod2pip --generate-env --force
+```
+
+### Comprehensive Test Suite
+Run all feature tests:
+```bash
+python test_mod2pip_features.py
+```
+
+### Demo Project
+Run the demo to see all features:
+```bash
+python demo_project.py
+```
+
+See README.md and CHANGELOG.md for detailed usage examples.
 
 ## Contributing
 
