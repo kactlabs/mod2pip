@@ -5,6 +5,7 @@ include CONTRIBUTING.rst
 include HISTORY.rst
 include ci_debug.py
 recursive-include mod2pip *.py
+recursive-include mod2pip *.json
 recursive-include mod2pip mapping
 recursive-include mod2pip stdlib
 recursive-exclude * __pycache__
