@@ -231,6 +231,66 @@ If validation issues are found:
 
 Patterns are defined in `mod2pip/env_patterns.json` and can be customized.
 
+## Why mod2pip over pipreqs?
+
+mod2pip addresses common limitations found in pipreqs:
+
+### 1. **Dynamic Import Detection**
+Unlike pipreqs which only uses static analysis, mod2pip detects:
+- `__import__()` calls
+- `importlib.import_module()` usage
+- Imports inside functions (late imports)
+- Conditional imports in try/except blocks
+- Imports in exec/eval statements
+
+```python
+# These are detected by mod2pip but missed by pipreqs
+import importlib
+pandas = importlib.import_module('pandas')
+
+def process_data():
+    import numpy as np  # Late import
+    return np.array([1, 2, 3])
+```
+
+### 2. **Conda Environment Support**
+mod2pip automatically detects packages installed via conda:
+- Reads conda-meta directory for package information
+- Maps conda package names to Python import names
+- Works seamlessly in mixed pip/conda environments
+
+### 3. **Transitive Dependencies (Optional)**
+Use `--include-transitive` to include indirect dependencies:
+```sh
+mod2pip --include-transitive --transitive-depth 2
+```
+
+### 4. **Enhanced Local Package Detection**
+Supports:
+- Editable packages (`pip install -e .`)
+- Namespace packages
+- Custom installation layouts
+- Non-standard package structures
+
+### 5. **Additional Features**
+- **Selective library addition**: `--lib` flag to add specific packages
+- **Environment file generation**: `--generate-env` to create .env files
+- **Environment validation**: `--validate-env` to check API keys and tokens
+- **Smart merging**: Preserves existing requirements when appending
+
+### 6. **Correct Package Names**
+mod2pip ensures accurate package naming:
+- Uses official PyPI package names (not import names)
+- Maintains correct capitalization (e.g., `Flask` not `flask`)
+- Comprehensive mapping file for special cases (e.g., `PIL` → `Pillow`, `cv2` → `opencv-python`)
+- Deduplicates packages to prevent version conflicts
+
+### 7. **Robust File Handling**
+- **Automatic directory creation**: Creates parent directories if they don't exist
+- **Symbolic link support**: `--no-follow-links` flag to control symlink behavior
+- **Nested project structures**: Handles deeply nested folders and unusual naming
+- **Graceful error handling**: Continues processing even if individual files fail
+
 ## Why not pip freeze?
 
 - `pip freeze` only saves the packages that are installed with `pip install` in your environment.
@@ -247,7 +307,7 @@ If you find mod2pip useful in your research and wish to cite it, please use the 
    author = {Raja CSP Raman},
    title = {mod2pip: Generate requirements.txt file for any project based on imports},
    url = {https://github.com/kactlabs/mod2pip/},
-   version = {0.9.0},
+   version = {0.11.0},
    year = {2025},
 }
 ```

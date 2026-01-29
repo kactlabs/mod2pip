@@ -46,11 +46,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed bare except clauses (E722)
   - Configured `.flake8` to ignore F541 (f-strings without placeholders)
   - Excluded test data files and documentation from linting
+- **Fixed package name capitalization**: Now uses correct PyPI package names from API response instead of import names (e.g., `Flask` instead of `flask`)
+- **Fixed duplicate package prevention**: Enhanced deduplication logic to prevent multiple versions of the same package
+- **Fixed directory creation**: Automatically creates parent directories when saving requirements.txt to nested paths (prevents "File not found" errors)
 
 ### Improved
 - Code quality improvements across all Python files
 - Better adherence to PEP 8 style guidelines
 - Cleaner, more maintainable codebase
+- More robust file handling with automatic directory creation
+- Enhanced error handling for file operations
 
 ### Documentation
 - Updated `README.md` with `--validate-env` examples and comprehensive list of 100+ supported patterns
